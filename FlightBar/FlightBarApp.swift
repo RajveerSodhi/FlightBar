@@ -27,15 +27,13 @@ struct DetailsView: View {
     @State private var flightNumber: String = ""
 
     var body: some View {
-        VStack(spacing: 10) {
+        VStack(alignment:.center, spacing: 10) {
             if let flight = flightViewModel.flight {
-                VStack(alignment: .leading, spacing: 5) {
-                    VStack(alignment: .center) {
-                        Text("Airline: \(flight.airline.name) \(flight.flight.iata)")
-                            .font(.headline)
-                        Text("Status: \(flight.flightStatus)")
-                            .font(.subheadline)
-                    }
+                VStack(spacing: 5) {
+                    Text("\(flight.airline.name) \(flight.flight.iata)")
+                        .font(.headline)
+                    Text("Status: \(flight.flightStatus)")
+                        .font(.subheadline)
                     
                     Divider()
                     
