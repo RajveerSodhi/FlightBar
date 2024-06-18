@@ -95,10 +95,17 @@ class JSONNull: Codable, Hashable {
 // MARK: - FlightViewModel
 class FlightViewModel: ObservableObject {
     @Published var flight: FlightInfo?
+    private let flightNumberKey = "storedFlightNumber"
+    
+    var storedFlightNumber: String {
+        UserDefaults.standard.string(forKey: flightNumberKey) ?? ""
+    }
 
-    func fetchFlightDetails() {
+    func fetchFlightDetails(for flightNumber: String) {
+        UserDefaults.standard.setValue(flightNumber, forKey: flightNumberKey)
+        guard !flightNumber.isEmpty else { return }
+
         let apiKey = "2a4e2e55b790b3e4e3ac063969cd8058"
-        let flightNumber = "SK4697" // Example flight number
         let urlString = "http://api.aviationstack.com/v1/flights?access_key=\(apiKey)&flight_iata=\(flightNumber)"
 
         guard let url = URL(string: urlString) else { return }
