@@ -12,6 +12,8 @@
 		550FB6102C20C9D400CAF47F /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 550FB60F2C20C9D400CAF47F /* Assets.xcassets */; };
 		550FB6132C20C9D400CAF47F /* Preview Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 550FB6122C20C9D400CAF47F /* Preview Assets.xcassets */; };
 		550FB61B2C214BA600CAF47F /* FlightViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 550FB61A2C214BA600CAF47F /* FlightViewModel.swift */; };
+		5585F20B2C222FC500F20A4B /* MenuBarView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5585F20A2C222FC500F20A4B /* MenuBarView.swift */; };
+		5585F20D2C22300000F20A4B /* DetailsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5585F20C2C22300000F20A4B /* DetailsView.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -23,6 +25,8 @@
 		550FB6142C20C9D400CAF47F /* FlightBar.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = FlightBar.entitlements; sourceTree = "<group>"; };
 		550FB61A2C214BA600CAF47F /* FlightViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FlightViewModel.swift; sourceTree = "<group>"; };
 		550FB61C2C21543A00CAF47F /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist; path = Info.plist; sourceTree = "<group>"; };
+		5585F20A2C222FC500F20A4B /* MenuBarView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MenuBarView.swift; sourceTree = "<group>"; };
+		5585F20C2C22300000F20A4B /* DetailsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DetailsView.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -62,6 +66,8 @@
 				550FB6142C20C9D400CAF47F /* FlightBar.entitlements */,
 				550FB6112C20C9D400CAF47F /* Preview Content */,
 				550FB61A2C214BA600CAF47F /* FlightViewModel.swift */,
+				5585F20A2C222FC500F20A4B /* MenuBarView.swift */,
+				5585F20C2C22300000F20A4B /* DetailsView.swift */,
 			);
 			path = FlightBar;
 			sourceTree = "<group>";
@@ -145,6 +151,8 @@
 			buildActionMask = 2147483647;
 			files = (
 				550FB61B2C214BA600CAF47F /* FlightViewModel.swift in Sources */,
+				5585F20D2C22300000F20A4B /* DetailsView.swift in Sources */,
+				5585F20B2C222FC500F20A4B /* MenuBarView.swift in Sources */,
 				550FB60E2C20C9D300CAF47F /* ContentView.swift in Sources */,
 				550FB60C2C20C9D300CAF47F /* FlightBarApp.swift in Sources */,
 			);
