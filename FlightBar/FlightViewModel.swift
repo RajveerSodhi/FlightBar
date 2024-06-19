@@ -106,7 +106,7 @@ class FlightViewModel: ObservableObject {
         guard !flightNumber.isEmpty else { return }
 
         let apiKey = "2a4e2e55b790b3e4e3ac063969cd8058"
-        let urlString = "http://api.aviationstack.com/v1/flights?access_key=\(apiKey)&flight_iata=\(flightNumber)"
+        let urlString = "http://api.aviationstack.com/v1/flights?access_key=\(apiKey)&flight_iata=\(flightNumber)&limit=1"
 
         guard let url = URL(string: urlString) else { return }
 
@@ -122,5 +122,20 @@ class FlightViewModel: ObservableObject {
                 print("Failed to decode JSON:", error)
             }
         }.resume()
+    }
+}
+
+extension FlightViewModel {
+    func loadDummyData() -> FlightResponse? {
+        if let url = Bundle.main.url(forResource: "dummyData", withExtension: "json") {
+            do {
+                let data = try Data(contentsOf: url)
+                let response = try JSONDecoder().decode(FlightResponse.self, from: data)
+                return response
+            } catch {
+                print("Failed to load dummy data:", error)
+            }
+        }
+        return nil
     }
 }
