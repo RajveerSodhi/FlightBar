@@ -12,7 +12,11 @@ struct MenuBarView: View {
 
     var body: some View {
         if let flight = flightViewModel.flight {
-            Text("\(flight.flight.iata) - \(flight.flightStatus)")
+            
+            let status = flight.flightStatus.capitalized
+            let flightNo = flight.flight.iata.uppercased()
+            
+            Text("\(flightNo) - \(status)")
         } else {
             Text("Loading Flight Details")
         }

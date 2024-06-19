@@ -9,9 +9,9 @@ import SwiftUI
 import MapKit
 
 struct DetailsView: View {
-    @EnvironmentObject var flightViewModel: FlightViewModel
     @State private var flightNumber: String = ""
-
+    @EnvironmentObject var flightViewModel: FlightViewModel
+    
     var body: some View {
         VStack(alignment:.center, spacing: 10) {
             if let flight = flightViewModel.flight {
@@ -30,7 +30,7 @@ struct DetailsView: View {
                             Image(systemName: "airplane")
                                 .foregroundStyle(.white)
                                 .padding()
-                                .background(.blue)
+                                .background(.red)
                                 .cornerRadius(10)
                         }
                     }
