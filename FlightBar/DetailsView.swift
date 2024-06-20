@@ -267,13 +267,13 @@ struct DetailsView: View {
                                 Text("ALT")
                                     .font(.caption)
                                     .foregroundColor(Color(hex: "#787878"))
-                                    .padding(.bottom, 6)
+                                    .padding(.bottom, 7)
                                     .padding([.trailing, .leading])
                                 
                                 Spacer()
                                 
                                 Text(direction)
-                                    .padding(.top, 6)
+                                    .padding(.top, 7)
                                 Text("DIR")
                                     .font(.caption)
                                     .foregroundColor(Color(hex: "#787878"))
@@ -284,11 +284,12 @@ struct DetailsView: View {
                             }
                                 .foregroundColor(.black)
                                 .padding()
+                                .frame(maxHeight: .infinity)
                                 .background(Rectangle()
                                     .foregroundColor(.white)
                                     .cornerRadius(15)
                                 )
-                        }
+                                                        }
                     }
                     
                     Spacer()
