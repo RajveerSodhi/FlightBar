@@ -1,12 +1,15 @@
 {
   "images" : [
     {
-      "filename" : "flightbar_menu.png",
+      "filename" : "flightbar_menu.svg",
       "idiom" : "universal"
     }
   ],
   "info" : {
     "author" : "xcode",
     "version" : 1
+  },
+  "properties" : {
+    "template-rendering-intent" : "template"
   }
 }

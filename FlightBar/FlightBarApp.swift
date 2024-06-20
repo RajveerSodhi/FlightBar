@@ -14,7 +14,6 @@ struct FlightBarApp: App {
             DetailsView()
                 .environmentObject(flightViewModel)
         } label: {
-            Image(systemName: "airplane.circle.fill")
             MenuBarView()
                 .environmentObject(flightViewModel)
         }

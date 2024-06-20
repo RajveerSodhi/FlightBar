@@ -11,6 +11,11 @@ struct MenuBarView: View {
     @EnvironmentObject var flightViewModel: FlightViewModel
 
     var body: some View {
+        Image("flightbar_menu")
+            .resizable()
+            .frame(width: 16, height: 16)
+            .padding()
+        
         if let flight = flightViewModel.flight {
             
             let status = flight.flightStatus.capitalized
@@ -21,9 +26,4 @@ struct MenuBarView: View {
             Text("Loading Flight Details")
         }
     }
-}
-
-
-#Preview {
-    MenuBarView()
 }
