@@ -21,9 +21,8 @@ struct DetailsView: View {
                 return String(word)
             }
         }
-        let newName = newNameArray.joined(separator: " ")
         
-        return newName
+        return newNameArray.joined(separator: " ")
     }
     
     func fixTime(dateTime: String) -> String {
@@ -42,9 +41,6 @@ struct DetailsView: View {
     var body: some View {
         VStack(alignment:.center, spacing: 10) {
             if let flight = flightViewModel.flight {
-            
-                let flightPos = CLLocationCoordinate2D(latitude: flight.live?.latitude ?? 0, longitude: flight.live?.longitude ?? 0)
-                @State var camera: MapCameraPosition = .region(MKCoordinateRegion(center: flightPos, latitudinalMeters: 500000, longitudinalMeters: 500000))
                 
                 let airline = flight.airline.name.capitalized
                 let status = flight.flightStatus.capitalized
@@ -59,12 +55,24 @@ struct DetailsView: View {
                 let arrivalActual = fixTime(dateTime:flight.arrival.actual ?? "N/A")
                 let departureEstimated = fixTime(dateTime:flight.departure.estimated ?? "N/A")
                 let arrivalEstimated = fixTime(dateTime:flight.arrival.estimated ?? "N/A")
+                let lastUpdated = fixTime(dateTime: flight.live?.updated ?? "N/A")
+                let latitude =  String((flight.live?.latitude ?? 0.0).rounded()) + "°"
+                let longitude =  String((flight.live?.longitude ?? 0.0).rounded()) + "°"
+                let altitude =  String((flight.live?.altitude ?? 0.0).rounded()) + "m"
+                let speedX = String((flight.live?.speedHorizontal ?? 0.0).rounded()) + "km/h"
+                let speedY = String((flight.live?.speedVertical ?? 0.0).rounded()) + "km/h"
+                let direction = String((flight.live?.direction ?? 0.0).rounded()) + "°"
+                
+                let flightPos = CLLocationCoordinate2D(latitude: flight.live?.latitude ?? 0.0, longitude: flight.live?.longitude ?? 0.0)
+                @State var camera: MapCameraPosition = .region(MKCoordinateRegion(center: flightPos, latitudinalMeters: 500000, longitudinalMeters: 500000))
                 
                 VStack(spacing: 5) {
                     Text("\(airline) - \(flightNo)")
-                        .font(.headline)
+                        .font(.title2)
                     Text((status))
-                        .font(.subheadline)
+                        .font(.headline)
+                    
+                    Spacer()
                     
                     Map(position: $camera) {
                         Annotation((flightNo), coordinate: flightPos) {
@@ -77,13 +85,13 @@ struct DetailsView: View {
                     }
                         .frame(height:140)
                         .cornerRadius(15)
-                    
+                        
                     Spacer()
                     
                     HStack {
                         VStack {
                             Text(departureAirportCode)
-                                .font(.headline)
+                                .font(.title3)
                             Text(departureAirport)
                                 .font(.subheadline)
                                 .foregroundColor(Color(hex: "#787878"))
@@ -134,7 +142,7 @@ struct DetailsView: View {
                         
                         VStack {
                             Text(arrivalAirportCode)
-                                .font(.headline)
+                                .font(.title3)
                             Text(arrivalAirport)
                                 .font(.subheadline)
                                 .foregroundColor(Color(hex: "#787878"))
@@ -172,49 +180,149 @@ struct DetailsView: View {
                                 Spacer()
                             }
                         }
-                        .foregroundColor(.black)
-                        .padding()
-                        .background(Rectangle()
-                            .foregroundColor(.white)
-                            .cornerRadius(15)
-                        )
+                            .foregroundColor(.black)
+                            .padding()
+                            .background(Rectangle()
+                                .foregroundColor(.white)
+                                .cornerRadius(15)
+                            )
                     }
                     
-                    Text("Timezone: UTC")
-                        .font(.caption)
+                    if flight.live == nil {
+                        
+                        Spacer()
+                        
+                        HStack {
+                            VStack {
+                                HStack {
+                                    
+                                    Spacer()
+                                    
+                                    VStack {
+                                        Text(latitude)
+                                        Text("LAT")
+                                            .font(.caption)
+                                            .foregroundColor(Color(hex: "#787878"))
+                                    }
+                                    
+                                    Spacer()
+                                    
+                                    VStack {
+                                        Text(longitude)
+                                        Text("LONG")
+                                            .font(.caption)
+                                            .foregroundColor(Color(hex: "#787878"))
+                                    }
+                                    
+                                    Spacer()
+                                    
+                                }
+                                .foregroundColor(.black)
+                                .padding()
+                                .frame(maxWidth: .infinity)
+                                .background(Rectangle()
+                                    .foregroundColor(.white)
+                                    .cornerRadius(15)
+                                )
+                                .padding(3)
+                                
+                                HStack {
+                                    
+                                    Spacer()
+                                    
+                                    VStack {
+                                        Text(speedY)
+                                        Text("SPD (Ver)")
+                                            .font(.caption)
+                                            .foregroundColor(Color(hex: "#787878"))
+                                    }
+                                    
+                                    Spacer()
+                                    
+                                    VStack {
+                                        Text(speedX)
+                                        Text("SPD (Hor)")
+                                            .font(.caption)
+                                            .foregroundColor(Color(hex: "#787878"))
+                                    }
+                                    
+                                    Spacer()
+                                    
+                                }
+                                .foregroundColor(.black)
+                                .padding()
+                                .frame(maxWidth: .infinity)
+                                .background(Rectangle()
+                                    .foregroundColor(.white)
+                                    .cornerRadius(15)
+                                )
+                                .padding(3)
+                            }
+                            
+                            VStack {
+                                Spacer()
+                            
+                                Text(altitude)
+                                    .padding(.top, 4)
+                                Text("ALT")
+                                    .font(.caption)
+                                    .foregroundColor(Color(hex: "#787878"))
+                                    .padding(.bottom, 6)
+                                    .padding([.trailing, .leading])
+                                
+                                Spacer()
+                                
+                                Text(direction)
+                                    .padding(.top, 6)
+                                Text("DIR")
+                                    .font(.caption)
+                                    .foregroundColor(Color(hex: "#787878"))
+                                    .padding(.bottom, 4)
+                                    .padding([.trailing, .leading])
+                            
+                                Spacer()
+                            }
+                                .foregroundColor(.black)
+                                .padding()
+                                .background(Rectangle()
+                                    .foregroundColor(.white)
+                                    .cornerRadius(15)
+                                )
+                        }
+                    }
                     
                     Spacer()
                     
-                    Divider()
+                    let message = flight.live != nil ? ". Last Updated: \(lastUpdated)" : ""
+                    Text("All times in UTC\(message)")
+                        .font(.footnote)
+                        .padding(.top, 5)
                     
-                    if let live = flight.live {
-                        Text("Current Flight Status")
-                            .font(.headline)
-                        
-                        Text("Latitude: \(live.latitude)")
-                        Text("Longitude: \(live.longitude)")
-                        Text("Altitude: \(live.altitude) meters")
-                        Text("Ground Speed: \(live.speedHorizontal) km/h")
-                        Text("Vertical Speed: \(live.speedVertical) m/s")
-                    }
                 }
             } else {
                 Text("Loading flight details...")
             }
             
-            TextField("Enter Flight Number", text: $flightNumber)
-                .textFieldStyle(RoundedBorderTextFieldStyle())
-                .padding([.leading, .trailing])
+            Divider()
             
-            Button(action: {
-                flightViewModel.fetchFlightDetails(for: flightNumber)
-            }) {
-                Text("Fetch Flight Details")
+            Text("Edit Flight Number")
+                .font(.headline)
+            
+            HStack {
+                TextField("Enter Flight Number", text: $flightNumber)
+                    .textFieldStyle(RoundedBorderTextFieldStyle())
+                    .padding(.trailing, 5)
+                
+                Button(action: {
+                    flightViewModel.fetchFlightDetails(for: flightNumber)
+                }) {
+                    Image(systemName: "magnifyingglass")
+                }
             }
-            .padding()
+            
         }
         .padding()
-        .frame(width: 420)
+        .frame(width: 400)
         .onAppear {
             flightNumber = flightViewModel.storedFlightNumber
             flightViewModel.fetchFlightDetails(for: flightNumber)

@@ -96,6 +96,7 @@ class JSONNull: Codable, Hashable {
 class FlightViewModel: ObservableObject {
     @Published var flight: FlightInfo?
     private let flightNumberKey = "storedFlightNumber"
+    private var timer: Timer?
     
     var storedFlightNumber: String {
         UserDefaults.standard.string(forKey: flightNumberKey) ?? ""
@@ -122,6 +123,31 @@ class FlightViewModel: ObservableObject {
                 print("Failed to decode JSON:", error)
             }
         }.resume()
+    }
+    
+    func startTimer() {
+        timer?.invalidate()
+        timer = Timer.scheduledTimer(withTimeInterval: 3600, repeats: true) { _ in
+            self.fetchFlightDetails(for: self.storedFlightNumber)
+        }
+    }
+
+    func stopTimer() {
+        timer?.invalidate()
+        timer = nil
+    }
+
+    private func checkFlightStatusAndUpdateTimer() {
+        guard let flightStatus = flight?.flightStatus.lowercased() else { return }
+        if ["landed", "cancelled", "incident", "diverted"].contains(flightStatus) {
+            stopTimer()
+        } else {
+            startTimer()
+        }
+    }
+    
+    deinit {
+        stopTimer()
     }
 }
 
