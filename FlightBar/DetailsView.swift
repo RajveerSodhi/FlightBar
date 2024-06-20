@@ -56,15 +56,19 @@ struct DetailsView: View {
                 let departureEstimated = fixTime(dateTime:flight.departure.estimated ?? "N/A")
                 let arrivalEstimated = fixTime(dateTime:flight.arrival.estimated ?? "N/A")
                 let lastUpdated = fixTime(dateTime: flight.live?.updated ?? "N/A")
-                let latitude =  String((flight.live?.latitude ?? 0.0).rounded()) + "°"
-                let longitude =  String((flight.live?.longitude ?? 0.0).rounded()) + "°"
+                let latitude =  String((flight.live?.latitude ?? 0.0).rounded())
+                let longitude =  String((flight.live?.longitude ?? 0.0).rounded())
                 let altitude =  String((flight.live?.altitude ?? 0.0).rounded()) + "m"
                 let speedX = String((flight.live?.speedHorizontal ?? 0.0).rounded()) + "km/h"
                 let speedY = String((flight.live?.speedVertical ?? 0.0).rounded()) + "km/h"
                 let direction = String((flight.live?.direction ?? 0.0).rounded()) + "°"
                 
-                let flightPos = CLLocationCoordinate2D(latitude: flight.live?.latitude ?? 0.0, longitude: flight.live?.longitude ?? 0.0)
-                @State var camera: MapCameraPosition = .region(MKCoordinateRegion(center: flightPos, latitudinalMeters: 500000, longitudinalMeters: 500000))
+                let flightPos = CLLocationCoordinate2D(latitude: flight.live?.latitude ?? 49.884491, longitude: flight.live?.longitude ?? -119.493500)
+                let flightSpan = MKCoordinateSpan(latitudeDelta: 0.65, longitudeDelta: 0.65)
+                let flightRegion = MKCoordinateRegion(center: flightPos, span: flightSpan)
+                let flightAngle = flight.live?.direction ?? 0.0
+                
+                @State var flightCamera: MapCameraPosition = .region(flightRegion)
                 
                 VStack(spacing: 5) {
                     Text("\(airline) - \(flightNo)")
@@ -74,19 +78,25 @@ struct DetailsView: View {
                     
                     Spacer()
                     
-                    Map(position: $camera) {
-                        Annotation((flightNo), coordinate: flightPos) {
-                            Image(systemName: "airplane")
-                                .foregroundStyle(.white)
-                                .padding()
-                                .background(.red)
-                                .cornerRadius(10)
+                    if flight.live != nil {
+                        Map(position: $flightCamera) {
+                            Annotation(flightNo, coordinate: flightPos) {
+                                Image(systemName: "airplane")
+                                    .resizable()
+                                    .imageScale(.large)
+                                    .foregroundStyle(.black)
+                                    .padding()
+                                    .background(.white)
+                                    .clipShape(/*@START_MENU_TOKEN@*/Circle()/*@END_MENU_TOKEN@*/)
+                                    .rotationEffect(.degrees(flightAngle))
+                                    
+                            }
                         }
+                            .frame(height:140)
+                            .cornerRadius(15)
+                            
+                        Spacer()
                     }
-                        .frame(height:140)
-                        .cornerRadius(15)
-                        
-                    Spacer()
                     
                     HStack {
                         VStack {
@@ -188,7 +198,7 @@ struct DetailsView: View {
                             )
                     }
                     
-                    if flight.live == nil {
+                    if flight.live != nil {
                         
                         Spacer()
                         
@@ -301,7 +311,7 @@ struct DetailsView: View {
                     
                 }
             } else {
-                Text("Loading flight details...")
+                Text("Live information unavailable for this flight")
             }
             
             Divider()

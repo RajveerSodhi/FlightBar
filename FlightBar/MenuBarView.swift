@@ -14,16 +14,15 @@ struct MenuBarView: View {
         Image("flightbar_menu")
             .resizable()
             .frame(width: 16, height: 16)
-            .padding()
-        
+
         if let flight = flightViewModel.flight {
             
             let status = flight.flightStatus.capitalized
             let flightNo = flight.flight.iata.uppercased()
             
-            Text("\(flightNo) - \(status)")
+            Text(" \(flightNo) - \(status)")
         } else {
-            Text("Loading Flight Details")
+            Text(" Loading Flight Details")
         }
     }
 }
