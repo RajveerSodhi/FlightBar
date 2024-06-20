@@ -180,6 +180,9 @@ struct DetailsView: View {
                         )
                     }
                     
+                    Text("Timezone: UTC")
+                        .font(.caption)
+                    
                     Spacer()
                     
                     Divider()

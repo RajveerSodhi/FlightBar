@@ -134,6 +134,11 @@ extension FlightViewModel {
                 return response
             } catch {
                 print("Failed to load dummy data:", error)
+                if let dummyResponse = self.loadDummyData() {
+                    DispatchQueue.main.async {
+                        self.flight = dummyResponse.data.first
+                    }
+                }
             }
         }
         return nil
