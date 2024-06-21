@@ -327,7 +327,8 @@ struct DetailsView: View {
                 Button(action: {
                     flightViewModel.fetchFlightDetails(for: flightNumber)
                 }) {
-                    Image(systemName: "magnifyingglass")
+                    Image(systemName: "arrow.clockwise")
+                        .frame(width: 16, height: 16)
                 }
             }
             

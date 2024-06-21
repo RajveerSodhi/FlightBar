@@ -22,7 +22,7 @@ struct MenuBarView: View {
             
             Text(" \(flightNo) - \(status)")
         } else {
-            Text(" Loading Flight Details")
+            Text(" Load Flight Details")
         }
     }
 }
