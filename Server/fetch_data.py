@@ -1,9 +1,9 @@
 from os import getenv
-from dotenv import load_dotenv
+# from dotenv import load_dotenv
 import requests
 from redis_client import r
 
-load_dotenv()
+# load_dotenv()
 API_KEY=getenv('API_KEY')
 
 def fetch_flight_schedule(flight_iata):
