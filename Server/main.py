@@ -21,7 +21,9 @@ app.add_middleware(
 # Root Endpoint
 @app.get("/")
 def root():
-    return {cache.ping()}
+    return {
+        "redis_conn_status": cache.ping()
+    }
 
 @app.get("/flight")
 def get_flight_data(iata):
