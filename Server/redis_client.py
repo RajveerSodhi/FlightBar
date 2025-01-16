@@ -6,7 +6,7 @@ from os import getenv
 
 REDIS_PASSWORD=getenv('REDIS_PASSWORD')
 
-r = Redis(
+cache = Redis(
     host='hot-dove-50927.upstash.io',
     port=6379,
     password=REDIS_PASSWORD,
