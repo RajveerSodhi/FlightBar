@@ -1,343 +1,117 @@
-//
-//  DetailsView.swift
-//  FlightBar
-//
-//  Created by Rajveer Sodhi on 2024-06-18.
-//
-
 import SwiftUI
 import MapKit
 
 struct DetailsView: View {
     @State private var flightNumber: String = ""
     @EnvironmentObject var flightViewModel: FlightViewModel
-    
+
+    func fixTime(dateTime: String?) -> String {
+        guard let dateTime = dateTime else { return "N/A" }
+        let components = dateTime.split(separator: "T")
+        return components.count > 1 ? String(components[1].prefix(5)) : "N/A"
+    }
+
     func fixAirportName(name: String) -> String {
         let words = name.split(separator: " ")
-        let newNameArray: [String] = words.map { word in
-            if word.uppercased() == "INTERNATIONAL" {
-                return "Intl"
-            } else {
-                return String(word)
-            }
-        }
-        
-        return newNameArray.joined(separator: " ")
+        return words.map { $0 == "International" ? "Intl" : String($0) }.joined(separator: " ")
     }
-    
-    func fixTime(dateTime: String) -> String {
-        
-        if dateTime == "N/A" {
-            return dateTime
-        }
-        
-        var time = dateTime.split(separator: "T")[1]
-        time = time.split(separator: "+")[0]
-        let newTime = time.dropLast(3)
-        
-        return String(newTime)
-    }
-    
+
     var body: some View {
-        VStack(alignment:.center, spacing: 10) {
+        VStack(alignment: .center, spacing: 10) {
             if let flight = flightViewModel.flight {
-                
                 let airline = flight.airline.name.capitalized
-                let status = flight.flightStatus.capitalized
-                let flightNo = flight.flight.iata.uppercased()
-                let departureAirportCode = flight.departure.iata.uppercased()
-                let departureAirport = fixAirportName(name: flight.departure.airport)
-                let arrivalAirportCode = flight.arrival.iata.uppercased()
-                let arrivalAirport = fixAirportName(name: flight.arrival.airport)
-                let departureScheduled = fixTime(dateTime: flight.departure.scheduled ?? "N/A")
-                let arrivalScheduled = fixTime(dateTime:flight.arrival.scheduled ?? "N/A")
-                let departureActual = fixTime(dateTime:flight.departure.actual ?? "N/A")
-                let arrivalActual = fixTime(dateTime:flight.arrival.actual ?? "N/A")
-                let departureEstimated = fixTime(dateTime:flight.departure.estimated ?? "N/A")
-                let arrivalEstimated = fixTime(dateTime:flight.arrival.estimated ?? "N/A")
-                let lastUpdated = fixTime(dateTime: flight.live?.updated ?? "N/A")
-                let latitude =  String((flight.live?.latitude ?? 0.0).rounded())
-                let longitude =  String((flight.live?.longitude ?? 0.0).rounded())
-                let altitude =  String((flight.live?.altitude ?? 0.0).rounded()) + "m"
-                let speedX = String((flight.live?.speedHorizontal ?? 0.0).rounded()) + "km/h"
-                let speedY = String((flight.live?.speedVertical ?? 0.0).rounded()) + "km/h"
-                let direction = String((flight.live?.direction ?? 0.0).rounded()) + "°"
-                
-                let flightPos = CLLocationCoordinate2D(latitude: flight.live?.latitude ?? 49.884491, longitude: flight.live?.longitude ?? -119.493500)
-                let flightSpan = MKCoordinateSpan(latitudeDelta: 0.65, longitudeDelta: 0.65)
-                let flightRegion = MKCoordinateRegion(center: flightPos, span: flightSpan)
-                let flightAngle = flight.live?.direction ?? 0.0
-                
-                @State var flightCamera: MapCameraPosition = .region(flightRegion)
-                
-                VStack(spacing: 5) {
-                    Text("\(airline) - \(flightNo)")
-                        .font(.title2)
-                    Text((status))
-                        .font(.headline)
-                    
-                    Spacer()
-                    
-                    if flight.live != nil {
-                        Map(position: $flightCamera) {
-                            Annotation(flightNo, coordinate: flightPos) {
-                                Image(systemName: "airplane")
-                                    .resizable()
-                                    .imageScale(.large)
-                                    .foregroundStyle(.black)
-                                    .padding()
-                                    .background(.white)
-                                    .clipShape(/*@START_MENU_TOKEN@*/Circle()/*@END_MENU_TOKEN@*/)
-                                    .rotationEffect(.degrees(flightAngle))
-                                    
-                            }
-                        }
-                            .frame(height:140)
-                            .cornerRadius(15)
-                            
-                        Spacer()
-                    }
-                    
+                let flightNo = flight.flightNo.uppercased()
+                let status = flight.status.capitalized
+                let departureScheduled = fixTime(dateTime: flight.departure.scheduledTime)
+                let departureEstimated = fixTime(dateTime: flight.departure.estimatedTime)
+                let departureActual = fixTime(dateTime: flight.departure.actualTime)
+                let arrivalScheduled = fixTime(dateTime: flight.arrival.scheduledTime)
+                let arrivalEstimated = fixTime(dateTime: flight.arrival.estimatedTime)
+                let arrivalActual = fixTime(dateTime: flight.arrival.actualTime)
+
+                VStack {
+                    Text("\(airline) - \(flightNo)").font(.title2)
+                    Text(status).font(.headline)
+
                     HStack {
                         VStack {
-                            Text(departureAirportCode)
+                            Text(flight.departure.iata.uppercased())
                                 .font(.title3)
-                            Text(departureAirport)
+                            Text(fixAirportName(name: flight.departure.name))
                                 .font(.subheadline)
-                                .foregroundColor(Color(hex: "#787878"))
-                                .frame(width: 100)
-                            
-                            Spacer()
-                            
+
                             HStack {
-                                Spacer()
-                                
                                 VStack {
-                                    Text(departureScheduled)
-                                    Text("SCHD")
-                                        .font(.caption)
-                                        .foregroundColor(Color(hex: "#787878"))
+                                    Text(departureScheduled).font(.body)
+                                    Text("SCHD").font(.caption).foregroundColor(.gray)
                                 }
-                                
-                                Spacer()
-                                
+
                                 VStack {
-                                    if ((departureActual) != "N/A") {
-                                        Text(departureActual)
-                                        Text("ACTL")
-                                            .font(.caption)
-                                            .foregroundColor(Color(hex: "#787878"))
-                                    }
-                                    else {
-                                        Text(departureEstimated)
-                                        Text("ESTD")
-                                            .font(.caption)
-                                            .foregroundColor(Color(hex: "#787878"))
+                                    if departureActual != "N/A" {
+                                        Text(departureActual).font(.body)
+                                        Text("ACTL").font(.caption).foregroundColor(.gray)
+                                    } else {
+                                        Text(departureEstimated).font(.body)
+                                        Text("ESTD").font(.caption).foregroundColor(.gray)
                                     }
                                 }
-                                
-                                Spacer()
                             }
                         }
-                        .foregroundColor(.black)
-                        .padding()
-                        .background(Rectangle()
-                            .foregroundColor(.white)
-                            .cornerRadius(15)
-                        )
-                        
-                        Spacer()
-                        Image(systemName: "arrow.forward")
-                        Spacer()
-                        
+
                         VStack {
-                            Text(arrivalAirportCode)
+                            Text(flight.arrival.iata.uppercased())
                                 .font(.title3)
-                            Text(arrivalAirport)
+                            Text(fixAirportName(name: flight.arrival.name))
                                 .font(.subheadline)
-                                .foregroundColor(Color(hex: "#787878"))
-                                .frame(width: 100)
-                            
-                            Spacer()
-                            
+
                             HStack {
-                                Spacer()
-                                
                                 VStack {
-                                    Text(arrivalScheduled)
-                                    Text("SCHD")
-                                        .font(.caption)
-                                        .foregroundColor(Color(hex: "#787878"))
+                                    Text(arrivalScheduled).font(.body)
+                                    Text("SCHD").font(.caption).foregroundColor(.gray)
                                 }
-                                
-                                Spacer()
-                                
+
                                 VStack {
-                                    if ((arrivalActual) != "N/A") {
-                                        Text(arrivalActual)
-                                        Text("ACTL")
-                                            .font(.caption)
-                                            .foregroundColor(Color(hex: "#787878"))
-                                    }
-                                    else {
-                                        Text(arrivalEstimated)
-                                        Text("ESTD")
-                                            .font(.caption)
-                                            .foregroundColor(Color(hex: "#787878"))
+                                    if arrivalActual != "N/A" {
+                                        Text(arrivalActual).font(.body)
+                                        Text("ACTL").font(.caption).foregroundColor(.gray)
+                                    } else {
+                                        Text(arrivalEstimated).font(.body)
+                                        Text("ESTD").font(.caption).foregroundColor(.gray)
                                     }
                                 }
-                                
-                                Spacer()
                             }
                         }
-                            .foregroundColor(.black)
-                            .padding()
-                            .background(Rectangle()
-                                .foregroundColor(.white)
-                                .cornerRadius(15)
-                            )
                     }
-                    
-                    if flight.live != nil {
-                        
-                        Spacer()
-                        
-                        HStack {
-                            VStack {
-                                HStack {
-                                    
-                                    Spacer()
-                                    
-                                    VStack {
-                                        Text(latitude)
-                                        Text("LAT")
-                                            .font(.caption)
-                                            .foregroundColor(Color(hex: "#787878"))
-                                    }
-                                    
-                                    Spacer()
-                                    
-                                    VStack {
-                                        Text(longitude)
-                                        Text("LONG")
-                                            .font(.caption)
-                                            .foregroundColor(Color(hex: "#787878"))
-                                    }
-                                    
-                                    Spacer()
-                                    
-                                }
-                                .foregroundColor(.black)
-                                .padding()
-                                .frame(maxWidth: .infinity)
-                                .background(Rectangle()
-                                    .foregroundColor(.white)
-                                    .cornerRadius(15)
-                                )
-                                .padding(3)
-                                
-                                HStack {
-                                    
-                                    Spacer()
-                                    
-                                    VStack {
-                                        Text(speedY)
-                                        Text("SPD (Ver)")
-                                            .font(.caption)
-                                            .foregroundColor(Color(hex: "#787878"))
-                                    }
-                                    
-                                    Spacer()
-                                    
-                                    VStack {
-                                        Text(speedX)
-                                        Text("SPD (Hor)")
-                                            .font(.caption)
-                                            .foregroundColor(Color(hex: "#787878"))
-                                    }
-                                    
-                                    Spacer()
-                                    
-                                }
-                                .foregroundColor(.black)
-                                .padding()
-                                .frame(maxWidth: .infinity)
-                                .background(Rectangle()
-                                    .foregroundColor(.white)
-                                    .cornerRadius(15)
-                                )
-                                .padding(3)
-                            }
-                            
-                            VStack {
-                                Spacer()
-                            
-                                Text(altitude)
-                                    .padding(.top, 4)
-                                Text("ALT")
-                                    .font(.caption)
-                                    .foregroundColor(Color(hex: "#787878"))
-                                    .padding(.bottom, 7)
-                                    .padding([.trailing, .leading])
-                                
-                                Spacer()
-                                
-                                Text(direction)
-                                    .padding(.top, 7)
-                                Text("DIR")
-                                    .font(.caption)
-                                    .foregroundColor(Color(hex: "#787878"))
-                                    .padding(.bottom, 4)
-                                    .padding([.trailing, .leading])
-                            
-                                Spacer()
-                            }
-                                .foregroundColor(.black)
-                                .padding()
-                                .frame(maxHeight: .infinity)
-                                .background(Rectangle()
-                                    .foregroundColor(.white)
-                                    .cornerRadius(15)
-                                )
-                                                        }
+
+                    if let geography = flight.geography, let speed = flight.speed {
+                        VStack {
+                            Text("Latitude: \(geography.latitude ?? 0)")
+                            Text("Longitude: \(geography.longitude ?? 0)")
+                            Text("Altitude: \(geography.altitude ?? 0)m")
+                            Text("Horizontal Speed: \(speed.horizontal ?? 0) km/h")
+                            Text("Vertical Speed: \(speed.vertical ?? 0) km/h")
+                        }.font(.body)
+                    } else {
+                        Text("No live flight data available").foregroundColor(.gray)
                     }
-                    
-                    Spacer()
-                    
-                    let message = flight.live != nil ? ". Last Updated: \(lastUpdated)" : ""
-                    Text("All times in UTC\(message)")
-                        .font(.footnote)
-                        .padding(.top, 5)
-                    
                 }
             } else {
-                Text("Live information unavailable for this flight")
+                Text("Flight details unavailable").foregroundColor(.red)
             }
-            
+
             Divider()
-            
-            Text("Edit Flight Number")
-                .font(.headline)
-            
+            Text("Enter Flight Number").font(.headline)
+
             HStack {
-                TextField("Enter Flight Number", text: $flightNumber)
+                TextField("Flight Number", text: $flightNumber)
                     .textFieldStyle(RoundedBorderTextFieldStyle())
                     .padding(.trailing, 5)
-                
                 Button(action: {
                     flightViewModel.fetchFlightDetails(for: flightNumber)
                 }) {
                     Image(systemName: "arrow.clockwise")
-                        .frame(width: 16, height: 16)
                 }
-            }
-            
-        }
-        .padding()
-        .frame(width: 400)
-        .onAppear {
-            flightNumber = flightViewModel.storedFlightNumber
-            flightViewModel.fetchFlightDetails(for: flightNumber)
-        }
+            }.padding()
+        }.padding()
     }
 }

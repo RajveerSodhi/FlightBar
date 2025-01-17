@@ -11,18 +11,19 @@ struct MenuBarView: View {
     @EnvironmentObject var flightViewModel: FlightViewModel
 
     var body: some View {
-        Image("flightbar_menu")
-            .resizable()
-            .frame(width: 16, height: 16)
+        HStack {
+            Image("flightbar_menu")
+                .resizable()
+                .frame(width: 16, height: 16)
 
-        if let flight = flightViewModel.flight {
-            
-            let status = flight.flightStatus.capitalized
-            let flightNo = flight.flight.iata.uppercased()
-            
-            Text(" \(flightNo) - \(status)")
-        } else {
-            Text(" Load Flight Details")
+            if let flight = flightViewModel.flight {
+                let status = flight.status.capitalized
+                let flightNo = flight.flightNo.uppercased()
+
+                Text(" \(flightNo) - \(status)")
+            } else {
+                Text(" Load Flight Details")
+            }
         }
     }
 }
