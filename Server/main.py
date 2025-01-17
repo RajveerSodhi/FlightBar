@@ -5,7 +5,9 @@ import json
 from redis_client import cache
 
 app = FastAPI(
-    title="FlightBar Server"
+    title="FlightBar Server",
+    version=1.0,
+    docs_url=None
 )
 
 origins = ["*"]
@@ -19,7 +21,7 @@ app.add_middleware(
 )
 
 # Root Endpoint
-@app.get("/")
+@app.get("/", include_in_schema=False)
 def root():
     return {
         "redis_conn_status": cache.ping()
@@ -42,17 +44,27 @@ def get_flight_data(iata):
             raise HTTPException(status_code=404, detail="Flight Schedule details not found")
         print("schedule found!")
 
-
         # Flight Live Details
         print("fetching flight live details.")
         flight_live_details = fetch_flight_live_details(iata)
         print("live details function returned!")
-        if not flight_live_details:
-            print("Error getting live details.")
-            raise HTTPException(status_code=404, detail="Flight Live details not found")
         
-        flight_data["speed"] = flight_live_details.get("speed", {})
-        flight_data["geography"] =flight_live_details.get("geography", {})
+        flight_data["speed"] = flight_live_details.get("speed", {
+            "vertical": None,
+            "horizontal": None
+        }) if flight_live_details else {"vertical": None, "horizontal": None}
+
+        flight_data["geography"] = flight_live_details.get("geography", {
+            "altitude": None,
+            "direction": None,
+            "latitude": None,
+            "longitude": None
+        }) if flight_live_details else {
+            "altitude": None,
+            "direction": None,
+            "latitude": None,
+            "longitude": None
+        }
         print("live details found!")
 
         # Airport Details
@@ -61,7 +73,7 @@ def get_flight_data(iata):
             if airport_iata:
                 cached_airport_data = cache.get(f"AIRPORT_{airport_iata}")
                 if cached_airport_data:
-                    flight_data[f"{airport_type}"] = json.loads(cached_airport_data)
+                    flight_data[f"{airport_type}"]["name"] = json.loads(cached_airport_data)
                 else:
                     airport_name = fetch_airport_name(airport_iata)
                     if not airport_name:
