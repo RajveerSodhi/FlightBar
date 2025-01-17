@@ -1,4 +1,5 @@
 import Foundation
+import UserNotifications
 
 // MARK: - FlightInfo
 struct FlightInfo: Codable {
@@ -58,6 +59,7 @@ struct Geography: Codable {
 class FlightViewModel: ObservableObject {
     @Published var flight: FlightInfo?
     @Published var errorMessage: String?
+    private var flightStatus: String? = "scheduled"
     private let flightNumberKey = "storedFlightNumber"
     private var timer: Timer?
 
@@ -103,10 +105,37 @@ class FlightViewModel: ObservableObject {
                     let flight = try JSONDecoder().decode(FlightInfo.self, from: data)
                     self.flight = flight
                     self.errorMessage = nil
+                    
+                    if self.flightStatus == nil {
+                        self.flightStatus = flight.status
+                    }
+                    
+                    if self.flightStatus != flight.status {
+                        self.flightStatus = flight.status
+                        UNUserNotificationCenter.current().requestAuthorization(options: [.alert]) { success, error in
+                            if success {
+                                print("Notifications authorized")
+                            } else if let error {
+                                print(error.localizedDescription)
+                            }
+                        }
+                        
+                        let content = UNMutableNotificationContent()
+                        content.title="Flight Status Change"
+                        content.subtitle="There is an update"
+                        content.sound = UNNotificationSound.default
+                        
+                        let trigger = UNTimeIntervalNotificationTrigger(timeInterval: 1, repeats: false)
+                        
+                        let request = UNNotificationRequest(identifier: UUID().uuidString, content: content, trigger: trigger)
+                        
+                        UNUserNotificationCenter.current().add(request)
+                    }
 
                     // Check if flight status is "Landed"
                     if flight.status.lowercased() == "landed" {
                         self.stopAutoRefresh()
+                        self.flightStatus = "scheduled"
                     }
                 } catch {
                     self.errorMessage = "Could not get flight data. Try again."
