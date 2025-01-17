@@ -64,6 +64,13 @@ class FlightViewModel: ObservableObject {
     var storedFlightNumber: String {
         UserDefaults.standard.string(forKey: flightNumberKey) ?? ""
     }
+    
+    func isValidFlightNumber(_ flightNumber: String) -> Bool {
+        let pattern = "^[A-Z]{1,2}\\d{1,4}$"
+        let regex = try? NSRegularExpression(pattern: pattern, options: .caseInsensitive)
+        let range = NSRange(location: 0, length: flightNumber.utf16.count)
+        return regex?.firstMatch(in: flightNumber, options: [], range: range) != nil
+    }
 
     func fetchFlightDetails(for flightNumber: String) {
         UserDefaults.standard.setValue(flightNumber, forKey: flightNumberKey)
@@ -71,8 +78,14 @@ class FlightViewModel: ObservableObject {
             self.errorMessage = "Please enter a flight number."
             return
         }
+        guard isValidFlightNumber(flightNumber) else {
+            self.errorMessage = "Please enter a valid IATA flight number."
+            return
+        }
 
         let urlString = "https://flightbar-55ccda97cd11.herokuapp.com/flight?iata=\(flightNumber)"
+        let testUrlString = "https://flightbar-55ccda97cd11.herokuapp.com/test"
+        
         guard let url = URL(string: urlString) else { return }
 
         self.errorMessage = nil
@@ -83,7 +96,7 @@ class FlightViewModel: ObservableObject {
                     return
                 }
                 guard let data = data else {
-                    self.errorMessage = "No data received."
+                    self.errorMessage = "Could not get flight data. Try again."
                     return
                 }
                 do {
@@ -96,7 +109,7 @@ class FlightViewModel: ObservableObject {
                         self.stopAutoRefresh()
                     }
                 } catch {
-                    self.errorMessage = "Failed to decode data: \(error.localizedDescription)"
+                    self.errorMessage = "Could not get flight data. Try again."
                 }
             }
         }.resume()
