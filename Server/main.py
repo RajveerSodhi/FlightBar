@@ -33,15 +33,18 @@ def root():
 
 '''
 
-Optimizing API calls:
+To Do:
 
-1. call for airport code to name from another API, potentially free
-2. limit calling of flight schedule API.
+1. limit calling of flight schedule API.
 Call when:
 a) If requested before takeoff
 - Flight is scheduled: get scheduled take off and landing time, keep updating to get estimated times and delay
 - Flight is en-route: get actual take off time (1)
 - Flight has landed: get actual landing time
+
+2. Add notifications for flight status change
+
+3. Custom symbols for flight status
 
 '''
 
