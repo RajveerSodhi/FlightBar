@@ -125,7 +125,7 @@ def get_flight_data(iata):
 
 @app.get("/test")
 def get_test():
-    return ({
+    return {
     "flight_no": "AC39",
     "airline": {
         "iata": "AC",
@@ -158,7 +158,7 @@ def get_test():
         "latitude": 0.0,
         "longitude": 0.0
     }
-})
+}
 
 # Resposne Format:
 
