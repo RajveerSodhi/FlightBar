@@ -79,9 +79,6 @@ struct DetailsView: View {
                             .frame(height: 140)
                             .cornerRadius(15)
                         } else {
-                            Text("Flight map not available")
-                                .foregroundColor(.gray)
-                                .padding(5)
                         }
                         
                         HStack {
@@ -151,9 +148,8 @@ struct DetailsView: View {
                                 Text("Vertical Speed: \(vspeed) km/h")
                             }
                             .font(.body)
-                            AC1049
                         } else {
-                            Text("Flight tracking data not available")
+                            Text("Tracking data only available while in flight")
                                 .foregroundColor(.gray)
                                 .padding(5)
                         }
@@ -170,7 +166,7 @@ struct DetailsView: View {
                     .textFieldStyle(RoundedBorderTextFieldStyle())
                     .padding(.trailing, 5)
                 Button(action: {
-                    flightViewModel.fetchFlightDetails(for: flightNumber)
+                    flightViewModel.startAutoRefresh(flightNumber: flightNumber)
                 }) {
                     Image(systemName: "arrow.clockwise")
                 }
