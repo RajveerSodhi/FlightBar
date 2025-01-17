@@ -36,9 +36,8 @@ struct DetailsView: View {
         VStack(alignment: .center, spacing: 10) {
             if let errorMessage = flightViewModel.errorMessage {
                 Text(errorMessage)
-                    .font(.headline)
                     .foregroundColor(.red)
-                    .padding()
+                    .padding(5)
                 } else if let flight = flightViewModel.flight {
                 let airline = flight.airline.name.capitalized
                 let flightNo = flight.flightNo.uppercased()
@@ -153,8 +152,9 @@ struct DetailsView: View {
                                 .padding(5)
                         }
                     }
-            } else {
-                Text("Flight details unavailable").foregroundColor(.red)
+                }
+            else {
+                Text("Enter a flight number to get started").foregroundColor(.gray)
             }
 
             Divider()
@@ -164,10 +164,13 @@ struct DetailsView: View {
                 TextField("Flight Number", text: $flightNumber)
                     .textFieldStyle(RoundedBorderTextFieldStyle())
                     .padding(.trailing, 5)
+                    .onSubmit {
+                        flightViewModel.startAutoRefresh(flightNumber: flightNumber)
+                    }
                 Button(action: {
                     flightViewModel.startAutoRefresh(flightNumber: flightNumber)
                 }) {
-                    Image(systemName: "arrow.clockwise")
+                    Image(systemName: "magnifyingglass")
                 }
             }.padding()
         }.padding()
