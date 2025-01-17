@@ -57,6 +57,7 @@ struct Geography: Codable {
 // MARK: - FlightViewModel
 class FlightViewModel: ObservableObject {
     @Published var flight: FlightInfo?
+    @Published var errorMessage: String?
     private let flightNumberKey = "storedFlightNumber"
 
     var storedFlightNumber: String {
@@ -65,26 +66,35 @@ class FlightViewModel: ObservableObject {
 
     func fetchFlightDetails(for flightNumber: String) {
         UserDefaults.standard.setValue(flightNumber, forKey: flightNumberKey)
-        guard !flightNumber.isEmpty else { return }
+        guard !flightNumber.isEmpty else {
+            self.errorMessage = "Please enter a flight number."
+            return
+        }
 
         let urlString = "https://flightbar-55ccda97cd11.herokuapp.com/flight?iata=\(flightNumber)"
-
         guard let url = URL(string: urlString) else { return }
 
-        URLSession.shared.dataTask(with: url) { data, response, error in
-            guard let data = data, error == nil else {
-                print("Error fetching flight data:", error ?? "Unknown error")
-                return
-            }
+        self.errorMessage = nil
+                URLSession.shared.dataTask(with: url) { data, response, error in
+                    guard let data = data, error == nil else {
+                        DispatchQueue.main.async {
+                            self.errorMessage = "Error fetching flight details. Please check your connection."
+                        }
+                        return
+                    }
 
-            do {
-                let flight = try JSONDecoder().decode(FlightInfo.self, from: data)
-                DispatchQueue.main.async {
-                    self.flight = flight
-                }
-            } catch {
-                print("Failed to decode JSON:", error)
-            }
-        }.resume()
+                    do {
+                        let flight = try JSONDecoder().decode(FlightInfo.self, from: data)
+                        DispatchQueue.main.async {
+                            self.flight = flight
+                            self.errorMessage = nil
+                        }
+                    } catch {
+                        DispatchQueue.main.async {
+                            self.errorMessage = "Flight details not found. Please check the flight number."
+                            self.flight = nil
+                        }
+                    }
+                }.resume()
     }
 }
