@@ -32,19 +32,23 @@ def root():
 
 To Do:
 
-1. limit calling of flight schedule API.
+1. limit calling flight schedule API.
 Call when:
 a) If requested before takeoff
 - Flight is scheduled: get scheduled take off and landing time, keep updating to get estimated times and delay
 - Flight is en-route: get actual take off time (1)
 - Flight has landed: get actual landing time
+b) If requested after takeoff
 
 2. Add notifications for flight status change
 
 3. Custom symbols for flight status
 
-'''
+4. Figure out if flight is > 10hours
 
+5. Airline Logo from Ninja API integration
+
+'''
 
 @app.get("/flight")
 def get_flight_data(iata):
@@ -118,7 +122,43 @@ def get_flight_data(iata):
 
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Unexpected Error: {str(e)}")
-    
+
+@app.get("/test")
+def get_test():
+    return ({
+    "flight_no": "AC39",
+    "airline": {
+        "iata": "AC",
+        "name": "Air Canada"
+    },
+    "departure": {
+        "iata": "YVR",
+        "scheduled_time": "2025-01-15T23:45:00.000",
+        "estimated_time": "2025-01-16T00:30:00.000",
+        "actual_time": "2025-01-16T00:19:00.000",
+        "delay": "35",
+        "name": "Vancouver International"
+    },
+    "arrival": {
+        "iata": "AKL",
+        "scheduled_time": "2025-01-17T11:00:00.000",
+        "estimated_time": "2025-01-17T10:43:00.000",
+        "actual_time": "2025-01-17T10:51:00.000",
+        "delay": 5,
+        "name": "Auckland International"
+    },
+    "status": "landed",
+    "speed": {
+        "vertical": 0.0,
+        "horizontal": 0.0
+    },
+    "geography": {
+        "altitude": 0.0,
+        "direction": 0.0,
+        "latitude": 0.0,
+        "longitude": 0.0
+    }
+})
 
 # Resposne Format:
 
