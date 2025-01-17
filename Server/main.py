@@ -20,12 +20,31 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
+cache_TTL_mins = 50
+cache_TTL_secs = cache_TTL_mins * 60
+
 # Root Endpoint
 @app.get("/", include_in_schema=False)
 def root():
     return {
         "redis_conn_status": cache.ping()
     }
+
+
+'''
+
+Optimizing API calls:
+
+1. call for airport code to name from another API, potentially free
+2. limit calling of flight schedule API.
+Call when:
+a) If requested before takeoff
+- Flight is scheduled: get scheduled take off and landing time, keep updating to get estimated times and delay
+- Flight is en-route: get actual take off time (1)
+- Flight has landed: get actual landing time
+
+'''
+
 
 @app.get("/flight")
 def get_flight_data(iata):
@@ -45,27 +64,28 @@ def get_flight_data(iata):
         print("schedule found!")
 
         # Flight Live Details
-        print("fetching flight live details.")
-        flight_live_details = fetch_flight_live_details(iata)
-        print("live details function returned!")
-        
-        flight_data["speed"] = flight_live_details.get("speed", {
-            "vertical": None,
-            "horizontal": None
-        }) if flight_live_details else {"vertical": None, "horizontal": None}
+        if flight_data["status"] != "active":
+            print("fetching flight live details.")
+            flight_live_details = fetch_flight_live_details(iata)
+            print("live details function returned!")
+            
+            flight_data["speed"] = flight_live_details.get("speed", {
+                "vertical": None,
+                "horizontal": None
+            }) if flight_live_details else {"vertical": None, "horizontal": None}
 
-        flight_data["geography"] = flight_live_details.get("geography", {
-            "altitude": None,
-            "direction": None,
-            "latitude": None,
-            "longitude": None
-        }) if flight_live_details else {
-            "altitude": None,
-            "direction": None,
-            "latitude": None,
-            "longitude": None
-        }
-        print("live details found!")
+            flight_data["geography"] = flight_live_details.get("geography", {
+                "altitude": None,
+                "direction": None,
+                "latitude": None,
+                "longitude": None
+            }) if flight_live_details else {
+                "altitude": None,
+                "direction": None,
+                "latitude": None,
+                "longitude": None
+            }
+            print("live details found!")
 
         # Airport Details
         for airport_type in ["arrival", "departure"]:
@@ -89,3 +109,41 @@ def get_flight_data(iata):
 
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Unexpected Error: {str(e)}")
+    
+
+# Resposne Format:
+
+# {
+#   "flight_no": "AC39",
+#   "airline": {
+#     "iata": "AC",
+#     "name": "Air Canada"
+#   },
+#   "departure": {
+#     "iata": "YVR",
+#     "scheduled_time": "2025-01-15T23:45:00.000",
+#     "estimated_time": "2025-01-16T00:30:00.000",
+#     "actual_time": "2025-01-16T00:19:00.000",
+#     "delay": "35",
+#     "name": "Vancouver International"
+#   },
+#   "arrival": {
+#     "iata": "AKL",
+#     "scheduled_time": "2025-01-17T11:00:00.000",
+#     "estimated_time": "2025-01-17T10:43:00.000",
+#     "actual_time": "2025-01-17T10:46:00.000",
+#     "delay": null,
+#     "name": "Auckland International"
+#   },
+#   "status": "landed",
+#   "speed": {
+#     "vertical": null,
+#     "horizontal": null
+#   },
+#   "geography": {
+#     "altitude": null,
+#     "direction": null,
+#     "latitude": null,
+#     "longitude": null
+#   }
+# }
