@@ -77,7 +77,7 @@ def get_flight_data(iata):
         cache_TTL_secs = cache_TTL_mins * 60
 
         # Flight Live Details (optional)
-        if flight_data["status"] != "active":
+        if flight_data["status"] == "active":
             print("fetching flight live details.")
             flight_live_details = fetch_flight_live_details(iata)
             print("live details function returned!")
@@ -114,7 +114,7 @@ def get_flight_data(iata):
                     
                     flight_data[f"{airport_type}"]["name"] = airport_name
                     cache.set(f"AIRPORT_{airport_iata}", json.dumps(airport_name))
-            print("airports found!")
+        print("airports found!")
 
         cache.setex(f"FLIGHT_{iata}", cache_TTL_secs, json.dumps(flight_data))
 
