@@ -56,7 +56,6 @@ struct DetailsView: View {
                         
                         if flight.geography?.altitude != nil  {
                             let geography = flight.geography
-                            let speed = flight.speed
                             
                             let flightPos = CLLocationCoordinate2D(latitude: geography?.latitude ?? 49.884491,
                                                                    longitude: geography?.longitude ?? -119.493500)

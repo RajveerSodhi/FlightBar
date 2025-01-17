@@ -105,7 +105,7 @@ class FlightViewModel: ObservableObject {
     func startAutoRefresh(flightNumber: String) {
         stopAutoRefresh()
         
-        let timer_mins: Double = 50
+        let timer_mins: Double = 30
         let timer_secs: Double = timer_mins * 60
 
         timer = Timer.scheduledTimer(withTimeInterval: timer_secs, repeats: true) { [weak self] _ in
