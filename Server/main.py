@@ -52,6 +52,7 @@ b) If requested after takeoff
 
 @app.get("/flight")
 def get_flight_data(iata):
+    iata = iata.upper()
     try:
         # if cached data, return that
         cached_data = cache.get(f"FLIGHT_{iata}")
