@@ -60,7 +60,7 @@ struct DetailsView: View {
                                                                    longitude: geography?.longitude ?? -119.493500)
                             let flightSpan = MKCoordinateSpan(latitudeDelta: 0.65, longitudeDelta: 0.65)
                             let flightRegion = MKCoordinateRegion(center: flightPos, span: flightSpan)
-                            let flightAngle = geography?.direction ?? 0.0
+                            let flightAngle = (geography?.direction ?? 0.0) - 90.0
                             
                             @State var flightCamera: MapCameraPosition = .region(flightRegion)
                             
