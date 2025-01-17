@@ -1,6 +1,6 @@
 from fastapi import FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
-from fetch_data import fetch_flight_schedule, fetch_airport_name, fetch_flight_live_details
+from fetch_data import fetch_flight_schedule, fetch_airport_name, fetch_flight_live_details, calculate_flying_hours
 import json
 from redis_client import cache
 
@@ -19,9 +19,6 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
-
-cache_TTL_mins = 50
-cache_TTL_secs = cache_TTL_mins * 60
 
 # Root Endpoint
 @app.get("/", include_in_schema=False)
@@ -52,6 +49,7 @@ a) If requested before takeoff
 @app.get("/flight")
 def get_flight_data(iata):
     try:
+        # if cached data, return that
         cached_data = cache.get(f"FLIGHT_{iata}")
         if cached_data:
             return json.loads(cached_data)
@@ -66,12 +64,20 @@ def get_flight_data(iata):
             raise HTTPException(status_code=404, detail="Flight Schedule details not found")
         print("schedule found!")
 
-        # Flight Live Details
+        # get refresh interval
+        flight_time = calculate_flying_hours(flight_data["departure"]["scheduled_time"], flight_data["arrival"]["scheduled_time"])
+        if flight_time <= 4:
+            cache_TTL_mins = 30
+        else:
+            cache_TTL_mins = 60
+        cache_TTL_secs = cache_TTL_mins * 60
+
+        # Flight Live Details (optional)
         if flight_data["status"] != "active":
             print("fetching flight live details.")
             flight_live_details = fetch_flight_live_details(iata)
             print("live details function returned!")
-            
+
             flight_data["speed"] = flight_live_details.get("speed", {
                 "vertical": None,
                 "horizontal": None
@@ -106,7 +112,7 @@ def get_flight_data(iata):
                     cache.set(f"AIRPORT_{airport_iata}", json.dumps(airport_name))
             print("airports found!")
 
-        cache.setex(f"FLIGHT_{iata}", 3600, json.dumps(flight_data))
+        cache.setex(f"FLIGHT_{iata}", cache_TTL_secs, json.dumps(flight_data))
 
         return flight_data
 

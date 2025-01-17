@@ -1,4 +1,5 @@
 from os import getenv
+from datetime import datetime
 # from dotenv import load_dotenv
 import requests
 
@@ -97,3 +98,12 @@ def fetch_airport_name(iata_code):
     except requests.exceptions.RequestException as e:
         print(f"Error fetching airport details for {iata_code}: {e}")
         return None
+
+def calculate_flying_hours(departure, arrival):
+    departure_time = datetime.strptime(departure, "%Y-%m-%dT%H:%M:%S.%f")
+    arrival_time = datetime.strptime(arrival, "%Y-%m-%dT%H:%M:%S.%f")
+    
+    flying_duration = arrival_time - departure_time
+    flying_hours = flying_duration.total_seconds() // 3600
+    
+    return int(flying_hours)
