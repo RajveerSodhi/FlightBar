@@ -7,10 +7,12 @@ import requests
 API_KEY=getenv('API_KEY')
 AIRPORT_API_KEY=getenv('AIRPORT_API_KEY')
 
+timeout = 10
+
 def fetch_flight_schedule(flight_iata, type):
     schedule_url = f"https://aviation-edge.com/v2/public/timetable?key={API_KEY}&type={type}&flight_iata={flight_iata}"
     try:
-        response = requests.get(schedule_url)
+        response = requests.get(schedule_url, timeout=timeout)
         if response.status_code == 200:
             data = response.json()
 
@@ -52,7 +54,7 @@ def fetch_flight_schedule(flight_iata, type):
 def fetch_flight_live_details(iata_code):
     flight_url = f'https://aviation-edge.com/v2/public/flights?key={API_KEY}&flightIata={iata_code}'
     try:
-        response = requests.get(flight_url)
+        response = requests.get(flight_url, timeout=timeout)
         if response.status_code == 200:
             data = response.json()
             if isinstance(data, list) and data:
@@ -86,7 +88,7 @@ def fetch_airport_name(iata_code):
     # airport_url = f'https://aviation-edge.com/v2/public/airportDatabase?codeIataAirport={iata_code}&key={API_KEY}'
     airport_url = f"https://api.api-ninjas.com/v1/airports?iata={iata_code}"
     try:
-        response = requests.get(airport_url, headers={'X-Api-Key': AIRPORT_API_KEY})
+        response = requests.get(airport_url, headers={'X-Api-Key': AIRPORT_API_KEY}, timeout=timeout)
         if response.status_code == 200:
             data = response.json()
             if isinstance(data, list) and data:
