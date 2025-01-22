@@ -10,6 +10,8 @@ struct DetailsView: View {
         let newNameArray: [String] = words.map { word in
             if word.uppercased() == "INTERNATIONAL" {
                 return "Intl"
+            } else if word.uppercased() == "AIRPORT" {
+                return "Airp."
             } else {
                 return String(word)
             }
@@ -58,7 +60,7 @@ struct DetailsView: View {
                             
                             let flightPos = CLLocationCoordinate2D(latitude: geography?.latitude ?? 49.884491,
                                                                    longitude: geography?.longitude ?? -119.493500)
-                            let flightSpan = MKCoordinateSpan(latitudeDelta: 0.65, longitudeDelta: 0.65)
+                            let flightSpan = MKCoordinateSpan(latitudeDelta: 1, longitudeDelta: 1)
                             let flightRegion = MKCoordinateRegion(center: flightPos, span: flightSpan)
                             let flightAngle = (geography?.direction ?? 0.0) - 90.0
                             
@@ -74,7 +76,7 @@ struct DetailsView: View {
                                         .rotationEffect(Angle(degrees: flightAngle))
                                 }
                             }
-                            .frame(height: 140)
+                            .frame(height: 150)
                             .cornerRadius(15)
                         } else {
                         }
@@ -174,5 +176,6 @@ struct DetailsView: View {
                 }
             }.padding()
         }.padding()
+            .frame(width: 350)
     }
 }
