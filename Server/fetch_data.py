@@ -98,8 +98,8 @@ def fetch_airport_details(iata_code):
                     "name": airport.get("name", {}),
                     "country": airport.get("country", {}),
                     "timezone": airport.get("timezone", {}),
-                    "latitude": airport.get("latitude", {}),
-                    "longitude": airport.get("longitude", {}),
+                    "latitude": float(airport.get("latitude", {})),
+                    "longitude": float(airport.get("longitude", {})),
                 }
         print(f"Error fetching airport details for {iata_code}: {response.status_code}")
         return None
