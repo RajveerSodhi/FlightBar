@@ -28,6 +28,13 @@ struct DetailsView: View {
         return String(newTime)
     }
     
+    func flightTime(flightMins: Int) -> String {
+        let hours = Int(flightMins / 60)
+        let mins = flightMins % 60
+        
+        return "\(hours)h \(mins)m"
+    }
+    
     func timeAgo(timestamp: String) -> String {
         let formatter = DateFormatter()
         formatter.dateFormat = "yyyy-MM-dd HH:mm:ss.SSSSSSXXX"
@@ -91,6 +98,7 @@ struct DetailsView: View {
                     VStack {
                         Text("\(airline) - \(flightNo)").font(.title2)
                         Text(status).font(.headline)
+                        Text(flightTime(flightMins: flightMins))
                         
                         if flight.geography?.altitude != nil  {
                             let flightPos = CLLocationCoordinate2D(latitude: flightLat, longitude: flightLong)
