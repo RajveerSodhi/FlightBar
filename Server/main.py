@@ -179,7 +179,7 @@ def get_test():
         "latitude": 0.0,
         "longitude": 0.0
     },
-    "timestamp": "01:39:35.893775"
+    "timestamp": "2025-01-22 02:59:13.421799+00:00"
 }
 
 # Resposne Format:
@@ -217,5 +217,5 @@ def get_test():
 #     "latitude": null,
 #     "longitude": null
 #   },
-#    "timestamp": "01:39:35.893775"
+#    "timestamp": "2025-01-22 02:59:13.421799+00:00"
 # }
