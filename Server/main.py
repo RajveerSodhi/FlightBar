@@ -54,10 +54,10 @@ b) If requested after takeoff
 
 '''
 
-async def validate_secret_key(x_api_key: str = Header(...)):
-    if x_api_key != REQ_KEY:
+async def validate_secret_key(x_key: str = Header(...)):
+    if x_key != REQ_KEY:
         raise HTTPException(status_code=401, detail="Invalid Secret Key")
-    return x_api_key
+    return x_key
 
 @app.post("/flight")
 def get_flight_data(iata, key: str = Depends(validate_secret_key)):
@@ -65,6 +65,9 @@ def get_flight_data(iata, key: str = Depends(validate_secret_key)):
         Private endpoint for the FlightBar app that fetches and caches flight information from external APIs.
         Returns a JSON object with relevant flight tracking information.
     '''
+    if not key:
+        raise HTTPException(status_code=401, detail="No Secret Key Provided")
+    
     iata = iata.upper()
     try:
         # if cached data, return that
