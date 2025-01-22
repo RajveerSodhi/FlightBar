@@ -11,9 +11,11 @@ struct FlightInfo: Codable {
     let speed: Speed?
     let geography: Geography?
     let timestamp: String
+    let flightMins: Int
 
     enum CodingKeys: String, CodingKey {
         case flightNo = "flight_no"
+        case flightMins = "flight_mins"
         case airline, departure, arrival, status, speed, geography, timestamp
     }
 }
@@ -31,14 +33,26 @@ struct Airport: Codable {
     let estimatedTime: String?
     let actualTime: String?
     let delay: String?
-    let name: String
+    let persistent: Persistent
 
     enum CodingKeys: String, CodingKey {
-        case iata, name
         case scheduledTime = "scheduled_time"
         case estimatedTime = "estimated_time"
         case actualTime = "actual_time"
-        case delay
+        case delay, persistent, iata
+    }
+}
+
+// MARK: - Persistent Airport
+struct Persistent: Codable {
+    let latitude: String
+    let longitude: String
+    let country: String
+    let name: String
+    let timezone: String
+    
+    enum CodingKeys: String, CodingKey {
+        case latitude, country, name, timezone, longitude
     }
 }
 

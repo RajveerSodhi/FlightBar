@@ -1,5 +1,6 @@
 from os import getenv
 from datetime import datetime
+import pytz
 from dotenv import load_dotenv
 import requests
 
@@ -84,7 +85,7 @@ def fetch_flight_live_details(iata_code):
         print(f"Error fetching flight live details for {iata_code}: {e}")
         return None
 
-def fetch_airport_name(iata_code):
+def fetch_airport_details(iata_code):
     # airport_url = f'https://aviation-edge.com/v2/public/airportDatabase?codeIataAirport={iata_code}&key={API_KEY}'
     airport_url = f"https://api.api-ninjas.com/v1/airports?iata={iata_code}"
     try:
@@ -93,18 +94,33 @@ def fetch_airport_name(iata_code):
             data = response.json()
             if isinstance(data, list) and data:
                 airport = data[0]
-                return airport.get("name")
+                return {
+                    "name": airport.get("name", {}),
+                    "country": airport.get("country", {}),
+                    "timezone": airport.get("timezone", {}),
+                    "latitude": airport.get("latitude", {}),
+                    "longitude": airport.get("longitude", {}),
+                }
         print(f"Error fetching airport details for {iata_code}: {response.status_code}")
         return None
     except requests.exceptions.RequestException as e:
         print(f"Error fetching airport details for {iata_code}: {e}")
         return None
 
-def calculate_flying_hours(departure, arrival):
-    departure_time = datetime.strptime(departure, "%Y-%m-%dT%H:%M:%S.%f")
-    arrival_time = datetime.strptime(arrival, "%Y-%m-%dT%H:%M:%S.%f")
+def calculate_flying_mins(departure_time, arrival_time, departure_timezone, arrival_timezone):
+    departure_dt = datetime.strptime(departure_time, "%Y-%m-%dT%H:%M:%S.%f")
+    arrival_dt = datetime.strptime(arrival_time, "%Y-%m-%dT%H:%M:%S.%f")
     
-    flying_duration = arrival_time - departure_time
-    flying_hours = flying_duration.total_seconds() // 3600
+    departure_tz = pytz.timezone(departure_timezone)
+    arrival_tz = pytz.timezone(arrival_timezone)
+
+    localized_departure_dt = departure_tz.localize(departure_dt)
+    localized_arrival_dt = arrival_tz.localize(arrival_dt)
+
+    utc_departure_dt = localized_departure_dt.astimezone(pytz.utc)
+    utc_arrival_dt = localized_arrival_dt.astimezone(pytz.utc)
+
+    flying_duration = utc_arrival_dt - utc_departure_dt
+    flying_mins = flying_duration.total_seconds() // 60
     
-    return int(flying_hours)
+    return int(flying_mins)

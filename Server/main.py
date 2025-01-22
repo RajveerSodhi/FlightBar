@@ -5,7 +5,7 @@ import time
 from dotenv import load_dotenv
 from fastapi import Depends, FastAPI, HTTPException, Header
 from fastapi.middleware.cors import CORSMiddleware
-from fetch_data import fetch_flight_schedule, fetch_airport_name, fetch_flight_live_details, calculate_flying_hours
+from fetch_data import fetch_flight_schedule, fetch_airport_details, fetch_flight_live_details, calculate_flying_mins
 from redis_client import cache
 
 load_dotenv()
@@ -88,8 +88,8 @@ def get_flight_data(iata, key: str = Depends(validate_secret_key)):
             return json.loads(cached_data)
 
         # Flight Schedule Details
-        # flight_data = fetch_flight_schedule(iata, "departure")
-        flight_data = retry_on_failure(fetch_flight_schedule, iata, "departure")
+        flight_data = fetch_flight_schedule(iata, "departure")
+        # flight_data = retry_on_failure(fetch_flight_schedule, iata, "departure")
         print(f"Fetching schedule for {iata} as departure")
         if not flight_data:
             print(f"No data found for departure. Trying arrival for {iata}")
@@ -98,19 +98,11 @@ def get_flight_data(iata, key: str = Depends(validate_secret_key)):
             raise HTTPException(status_code=404, detail="Flight Schedule details not found")
         print("schedule found!")
 
-        # get refresh interval
-        flight_time = calculate_flying_hours(flight_data["departure"]["scheduled_time"], flight_data["arrival"]["scheduled_time"])
-        if flight_time <= 4:
-            cache_ttl_mins = 24
-        else:
-            cache_ttl_mins = 48
-        cache_ttl_secs = (cache_ttl_mins - 1) * 60
-
         # Flight Live Details (optional)
         if flight_data["status"] == "active":
             print("fetching flight live details.")
-            flight_live_details = retry_on_failure(fetch_flight_live_details, iata)
-            # flight_live_details = fetch_flight_live_details(iata)
+            # flight_live_details = retry_on_failure(fetch_flight_live_details, iata)
+            flight_live_details = fetch_flight_live_details(iata)
             print("live details function returned!")
 
             flight_data["speed"] = flight_live_details.get("speed", {
@@ -137,19 +129,36 @@ def get_flight_data(iata, key: str = Depends(validate_secret_key)):
             if airport_iata:
                 cached_airport_data = cache.get(f"AIRPORT_{airport_iata}")
                 if cached_airport_data:
-                    flight_data[f"{airport_type}"]["name"] = json.loads(cached_airport_data)
+                    flight_data[f"{airport_type}"]["persistent"] = json.loads(cached_airport_data)
                 else:
-                    # airport_name = fetch_airport_name(airport_iata)
-                    airport_name = retry_on_failure(fetch_airport_name, airport_iata)
-                    if not airport_name:
+                    airport_details = fetch_airport_details(airport_iata)
+                    # airport_name = retry_on_failure(fetch_airport_details, airport_iata)
+                    if not airport_details:
                         raise HTTPException(status_code=404, detail="Airport details not found")
                     
-                    flight_data[f"{airport_type}"]["name"] = airport_name
-                    cache.set(f"AIRPORT_{airport_iata}", json.dumps(airport_name))
-        print("airports found!")
+                    flight_data[f"{airport_type}"]["persistent"] = airport_details.get(f"{airport_type}", {
+                        "name": None,
+                        "country": None,
+                        "timezone": None,
+                        "latitude": None,
+                        "longitude": None
+                    })
+
+                    cache.set(f"AIRPORT_{airport_iata}", json.dumps(airport_details))
+            print(f"{airport_type} airport details found!")
 
         timestamp = datetime.now(timezone.utc)
         flight_data["timestamp"] = str(timestamp)
+
+        # get flying time
+        flight_mins = calculate_flying_mins(flight_data["departure"]["scheduled_time"], flight_data["arrival"]["scheduled_time"], flight_data["departure"]["persistent"]["timezone"], flight_data["arrival"]["persistent"]["timezone"])
+        flight_hours = int(flight_mins / 60)
+
+        # get refresh interval
+        cache_ttl_mins = 24 if flight_hours <= 4 else 48
+        cache_ttl_secs = (cache_ttl_mins - 1) * 60
+
+        flight_data["flight_mins"] = flight_mins
 
         cache.setex(f"FLIGHT_{iata}", cache_ttl_secs, json.dumps(flight_data))
 
@@ -193,7 +202,8 @@ def get_test():
         "latitude": 0.0,
         "longitude": 0.0
     },
-    "timestamp": "2025-01-22 02:59:13.421799+00:00"
+    "timestamp": "2025-01-22 02:59:13.421799+00:00",
+    "flight_mins": 0
 }
 
 # Resposne Format:
@@ -231,5 +241,6 @@ def get_test():
 #     "latitude": null,
 #     "longitude": null
 #   },
-#    "timestamp": "2025-01-22 02:59:13.421799+00:00"
+#   "timestamp": "2025-01-22 02:59:13.421799+00:00",
+#   "flight_mins": 0
 # }

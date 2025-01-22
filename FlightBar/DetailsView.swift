@@ -66,6 +66,9 @@ struct DetailsView: View {
                     let arrivalEstimated = fixTime(dateTime: flight.arrival.estimatedTime ?? "N/A")
                     let arrivalActual = fixTime(dateTime: flight.arrival.actualTime ?? "N/A")
                     let lastUpdatedText = timeAgo(timestamp: flight.timestamp)
+                    let flightMins = flight.flightMins
+                    let flightHours = Int(flightMins / 60)
+                    let latLongDelta = flightHours <= 4 ? 1.2 : 2.8
 
                     VStack {
                         Text("\(airline) - \(flightNo)").font(.title2)
@@ -76,7 +79,7 @@ struct DetailsView: View {
                             
                             let flightPos = CLLocationCoordinate2D(latitude: geography?.latitude ?? 49.884491,
                                                                    longitude: geography?.longitude ?? -119.493500)
-                            let flightSpan = MKCoordinateSpan(latitudeDelta: 1, longitudeDelta: 1)
+                            let flightSpan = MKCoordinateSpan(latitudeDelta: latLongDelta, longitudeDelta: latLongDelta)
                             let flightRegion = MKCoordinateRegion(center: flightPos, span: flightSpan)
                             let flightAngle = (geography?.direction ?? 0.0) - 90.0
                             
