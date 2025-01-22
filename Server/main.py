@@ -1,4 +1,5 @@
 from os import getenv
+from datetime import datetime
 import json
 # from dotenv import load_dotenv
 from fastapi import Depends, FastAPI, HTTPException, Header
@@ -133,6 +134,9 @@ def get_flight_data(iata, key: str = Depends(validate_secret_key)):
                     cache.set(f"AIRPORT_{airport_iata}", json.dumps(airport_name))
         print("airports found!")
 
+        timestamp = datetime.now().time()
+        flight_data["timestamp"] = timestamp
+
         cache.setex(f"FLIGHT_{iata}", cache_ttl_secs, json.dumps(flight_data))
 
         return flight_data
@@ -174,7 +178,8 @@ def get_test():
         "direction": 0.0,
         "latitude": 0.0,
         "longitude": 0.0
-    }
+    },
+    "timestamp": "01:39:35.893775"
 }
 
 # Resposne Format:
@@ -211,5 +216,6 @@ def get_test():
 #     "direction": null,
 #     "latitude": null,
 #     "longitude": null
-#   }
+#   },
+#    "timestamp": "01:39:35.893775"
 # }
