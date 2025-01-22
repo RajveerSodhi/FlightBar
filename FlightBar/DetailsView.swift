@@ -4,6 +4,7 @@ import Foundation
 
 struct DetailsView: View {
     @State private var flightNumber: String = ""
+    @State private var isLoaded: Bool = true
     @EnvironmentObject var flightViewModel: FlightViewModel
 
     func fixAirportName(name: String) -> String {
@@ -54,16 +55,17 @@ struct DetailsView: View {
                     .foregroundColor(.red)
                     .padding(5)
                 } else if let flight = flightViewModel.flight {
-                let airline = flight.airline.name.capitalized
-                let flightNo = flight.flightNo.uppercased()
-                let status = flight.status.capitalized
-                let departureScheduled = fixTime(dateTime: flight.departure.scheduledTime ?? "N/A")
-                let departureEstimated = fixTime(dateTime: flight.departure.estimatedTime ?? "N/A")
-                let departureActual = fixTime(dateTime: flight.departure.actualTime ?? "N/A")
-                let arrivalScheduled = fixTime(dateTime: flight.arrival.scheduledTime ?? "N/A")
-                let arrivalEstimated = fixTime(dateTime: flight.arrival.estimatedTime ?? "N/A")
-                let arrivalActual = fixTime(dateTime: flight.arrival.actualTime ?? "N/A")
-                let lastUpdatedText = timeAgo(timestamp: flight.timestamp)
+    
+                    let airline = flight.airline.name.capitalized
+                    let flightNo = flight.flightNo.uppercased()
+                    let status = flight.status.capitalized
+                    let departureScheduled = fixTime(dateTime: flight.departure.scheduledTime ?? "N/A")
+                    let departureEstimated = fixTime(dateTime: flight.departure.estimatedTime ?? "N/A")
+                    let departureActual = fixTime(dateTime: flight.departure.actualTime ?? "N/A")
+                    let arrivalScheduled = fixTime(dateTime: flight.arrival.scheduledTime ?? "N/A")
+                    let arrivalEstimated = fixTime(dateTime: flight.arrival.estimatedTime ?? "N/A")
+                    let arrivalActual = fixTime(dateTime: flight.arrival.actualTime ?? "N/A")
+                    let lastUpdatedText = timeAgo(timestamp: flight.timestamp)
 
                     VStack {
                         Text("\(airline) - \(flightNo)").font(.title2)
@@ -186,13 +188,27 @@ struct DetailsView: View {
                     .padding(.trailing, 5)
                     .onSubmit {
                         flightNumber = flightNumber.uppercased()
-                        flightViewModel.startAutoRefresh(flightNumber: flightNumber)
+                        isLoaded = false
+                        flightViewModel.startAutoRefresh(flightNumber: flightNumber) {
+                            isLoaded = true
+                        }
                     }
                 Button(action: {
                     flightNumber = flightNumber.uppercased()
-                    flightViewModel.startAutoRefresh(flightNumber: flightNumber)
+                    isLoaded = false
+                    flightViewModel.startAutoRefresh(flightNumber: flightNumber) {
+                        isLoaded = true
+                    }
                 }) {
-                    Image(systemName: "magnifyingglass")
+                    if flightNumber != "" && isLoaded != true {
+//                        Image(systemName: "circle.dotted")
+                        ProgressView()
+                            .scaleEffect(0.5)
+                            .frame(width: 18, height: 18)
+                    } else {
+                        Image(systemName: "magnifyingglass")
+                            .frame(width: 18, height: 18)
+                    }
                 }
             }.padding()
         }.padding()

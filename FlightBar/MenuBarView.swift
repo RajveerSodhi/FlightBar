@@ -14,7 +14,7 @@ struct MenuBarView: View {
         HStack {
             Image("flightbar_menu")
                 .resizable()
-                .frame(width: 16, height: 16)
+                .frame(width: 15, height: 15)
 
             if let flight = flightViewModel.flight {
                 let status = flight.status.capitalized

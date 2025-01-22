@@ -105,7 +105,7 @@ class FlightViewModel: ObservableObject {
         }
     }
 
-    func fetchFlightDetails(for flightNumber: String) {
+    func fetchFlightDetails(for flightNumber: String, completion: @escaping () -> Void) {
         UserDefaults.standard.setValue(flightNumber, forKey: flightNumberKey)
         guard !flightNumber.isEmpty else {
             self.errorMessage = "Please enter a flight number."
@@ -115,7 +115,7 @@ class FlightViewModel: ObservableObject {
             self.errorMessage = "Please enter a valid IATA flight number."
             return
         }
-        
+
         // Prepare request
         guard let url = URL(string: "\(urlString)?iata=\(flightNumber)") else { return }
 
@@ -152,20 +152,21 @@ class FlightViewModel: ObservableObject {
                     self.errorMessage = "Could not get flight data. Try again."
                 }
             }
+            completion()
         }.resume()
     }
     
-    func startAutoRefresh(flightNumber: String) {
+    func startAutoRefresh(flightNumber: String, completion: @escaping () -> Void) {
         stopAutoRefresh()
         
-        let timer_mins: Double = 30
+        let timer_mins: Double = 24
         let timer_secs: Double = timer_mins * 60
 
         timer = Timer.scheduledTimer(withTimeInterval: timer_secs, repeats: true) { [weak self] _ in
-            self?.fetchFlightDetails(for: flightNumber)
+            self?.fetchFlightDetails(for: flightNumber, completion: completion)
         }
         
-        fetchFlightDetails(for: flightNumber)
+        fetchFlightDetails(for: flightNumber, completion: completion)
         print("function called again!")
     }
 
