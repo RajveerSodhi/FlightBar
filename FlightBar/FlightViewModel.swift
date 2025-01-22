@@ -45,11 +45,11 @@ struct Airport: Codable {
 
 // MARK: - Persistent Airport
 struct Persistent: Codable {
-    let latitude: String
-    let longitude: String
-    let country: String
-    let name: String
-    let timezone: String
+    let latitude: String?
+    let longitude: String?
+    let country: String?
+    let name: String?
+    let timezone: String?
     
     enum CodingKeys: String, CodingKey {
         case latitude, country, name, timezone, longitude

@@ -55,33 +55,51 @@ struct DetailsView: View {
                     .foregroundColor(.red)
                     .padding(5)
                 } else if let flight = flightViewModel.flight {
-    
+                    
+                    // Misc flight info
                     let airline = flight.airline.name.capitalized
                     let flightNo = flight.flightNo.uppercased()
                     let status = flight.status.capitalized
-                    let departureScheduled = fixTime(dateTime: flight.departure.scheduledTime ?? "N/A")
-                    let departureEstimated = fixTime(dateTime: flight.departure.estimatedTime ?? "N/A")
-                    let departureActual = fixTime(dateTime: flight.departure.actualTime ?? "N/A")
-                    let arrivalScheduled = fixTime(dateTime: flight.arrival.scheduledTime ?? "N/A")
-                    let arrivalEstimated = fixTime(dateTime: flight.arrival.estimatedTime ?? "N/A")
-                    let arrivalActual = fixTime(dateTime: flight.arrival.actualTime ?? "N/A")
                     let lastUpdatedText = timeAgo(timestamp: flight.timestamp)
                     let flightMins = flight.flightMins
                     let flightHours = Int(flightMins / 60)
                     let latLongDelta = flightHours <= 4 ? 1.2 : 2.8
+                    
+                    // Departure Airport info
+                    let departureName = fixAirportName(name: flight.departure.persistent.name ?? "N/A")
+                    let departureScheduled = fixTime(dateTime: flight.departure.scheduledTime ?? "N/A")
+                    let departureEstimated = fixTime(dateTime: flight.departure.estimatedTime ?? "N/A")
+                    let departureActual = fixTime(dateTime: flight.departure.actualTime ?? "N/A")
+                    let departureIata = flight.departure.iata.uppercased() ?? "N/A"
+                    let departureLat = Double(flight.departure.persistent.latitude ?? "49.884491")
+                    let departureLong = Double(flight.departure.persistent.longitude ?? "-119.493500")
+                    
+                    // Arrival Airport info
+                    let arrivalName = fixAirportName(name: flight.arrival.persistent.name ?? "N/A")
+                    let arrivalScheduled = fixTime(dateTime: flight.arrival.scheduledTime ?? "N/A")
+                    let arrivalEstimated = fixTime(dateTime: flight.arrival.estimatedTime ?? "N/A")
+                    let arrivalActual = fixTime(dateTime: flight.arrival.actualTime ?? "N/A")
+                    let arrivalIata = flight.arrival.iata.uppercased() ?? "N/A"
+                    let arrivalLat = Double(flight.arrival.persistent.latitude ?? "49.884491")
+                    let arrivalLong = Double(flight.arrival.persistent.longitude ?? "-119.493500")
+                    
+                    // Flight Map info
+                    let flightLat = flight.geography?.latitude ?? 49.884491
+                    let flightLong = flight.geography?.longitude ?? -119.493500
+                    let flightAngle = ((flight.geography?.direction ?? 0.0) - 90)
 
                     VStack {
                         Text("\(airline) - \(flightNo)").font(.title2)
                         Text(status).font(.headline)
                         
                         if flight.geography?.altitude != nil  {
-                            let geography = flight.geography
+                            let flightPos = CLLocationCoordinate2D(latitude: flightLat,
+                                                                   longitude: flightLong)
                             
-                            let flightPos = CLLocationCoordinate2D(latitude: geography?.latitude ?? 49.884491,
-                                                                   longitude: geography?.longitude ?? -119.493500)
+                            
+                            
                             let flightSpan = MKCoordinateSpan(latitudeDelta: latLongDelta, longitudeDelta: latLongDelta)
                             let flightRegion = MKCoordinateRegion(center: flightPos, span: flightSpan)
-                            let flightAngle = (geography?.direction ?? 0.0) - 90.0
                             
                             @State var flightCamera: MapCameraPosition = .region(flightRegion)
                             
@@ -102,9 +120,9 @@ struct DetailsView: View {
                         
                         HStack {
                             VStack {
-                                Text(flight.departure.iata.uppercased())
+                                Text(departureIata)
                                     .font(.title3)
-                                Text(fixAirportName(name: flight.departure.name))
+                                Text(departureName)
                                     .font(.subheadline)
                                 
                                 HStack {
@@ -126,9 +144,9 @@ struct DetailsView: View {
                             }
                             
                             VStack {
-                                Text(flight.arrival.iata.uppercased())
+                                Text(arrivalIata)
                                     .font(.title3)
-                                Text(fixAirportName(name: flight.arrival.name))
+                                Text(arrivalName)
                                     .font(.subheadline)
                                 
                                 HStack {
