@@ -1,8 +1,8 @@
 from redis import Redis
 from dotenv import load_dotenv
-from os import getenv
+# from os import getenv
 
-load_dotenv()
+# load_dotenv()
 
 REDIS_HOST=getenv('REDIS_HOST')
 REDIS_PASSWORD=getenv('REDIS_PASSWORD')

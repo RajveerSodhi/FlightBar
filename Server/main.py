@@ -2,13 +2,13 @@ from os import getenv
 from datetime import datetime, timezone
 import json
 import time
-from dotenv import load_dotenv
+# from dotenv import load_dotenv
 from fastapi import Depends, FastAPI, HTTPException, Header
 from fastapi.middleware.cors import CORSMiddleware
 from fetch_data import fetch_flight_schedule, fetch_airport_details, fetch_flight_live_details, calculate_flying_mins
 from redis_client import cache
 
-load_dotenv()
+# load_dotenv()
 REQ_KEY = getenv('REQ_KEY')
 
 app = FastAPI(

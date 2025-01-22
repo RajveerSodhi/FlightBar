@@ -1,10 +1,10 @@
 from os import getenv
 from datetime import datetime
 import pytz
-from dotenv import load_dotenv
+# from dotenv import load_dotenv
 import requests
 
-load_dotenv()
+# load_dotenv()
 API_KEY=getenv('API_KEY')
 AIRPORT_API_KEY=getenv('AIRPORT_API_KEY')
 
