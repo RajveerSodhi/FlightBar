@@ -63,25 +63,25 @@ struct DetailsView: View {
                     let lastUpdatedText = timeAgo(timestamp: flight.timestamp)
                     let flightMins = flight.flightMins
                     let flightHours = Int(flightMins / 60)
-                    let latLongDelta = flightHours <= 4 ? 1.2 : 2.8
+                    let latLongDelta = flightHours <= 4 ? 1.25 : 10
                     
                     // Departure Airport info
-                    let departureName = fixAirportName(name: flight.departure.persistent.name ?? "N/A")
+                    let departureName = fixAirportName(name: flight.departure.persistent.name)
                     let departureScheduled = fixTime(dateTime: flight.departure.scheduledTime ?? "N/A")
                     let departureEstimated = fixTime(dateTime: flight.departure.estimatedTime ?? "N/A")
                     let departureActual = fixTime(dateTime: flight.departure.actualTime ?? "N/A")
-                    let departureIata = flight.departure.iata.uppercased() ?? "N/A"
-                    let departureLat = Double(flight.departure.persistent.latitude ?? "49.884491")
-                    let departureLong = Double(flight.departure.persistent.longitude ?? "-119.493500")
+                    let departureIata = flight.departure.iata.uppercased()
+                    let departureLat = flight.departure.persistent.latitude
+                    let departureLong = flight.departure.persistent.longitude
                     
                     // Arrival Airport info
-                    let arrivalName = fixAirportName(name: flight.arrival.persistent.name ?? "N/A")
+                    let arrivalName = fixAirportName(name: flight.arrival.persistent.name)
                     let arrivalScheduled = fixTime(dateTime: flight.arrival.scheduledTime ?? "N/A")
                     let arrivalEstimated = fixTime(dateTime: flight.arrival.estimatedTime ?? "N/A")
                     let arrivalActual = fixTime(dateTime: flight.arrival.actualTime ?? "N/A")
-                    let arrivalIata = flight.arrival.iata.uppercased() ?? "N/A"
-                    let arrivalLat = Double(flight.arrival.persistent.latitude ?? "49.884491")
-                    let arrivalLong = Double(flight.arrival.persistent.longitude ?? "-119.493500")
+                    let arrivalIata = flight.arrival.iata.uppercased()
+                    let arrivalLat = flight.arrival.persistent.latitude
+                    let arrivalLong = flight.arrival.persistent.longitude
                     
                     // Flight Map info
                     let flightLat = flight.geography?.latitude ?? 49.884491
@@ -93,10 +93,9 @@ struct DetailsView: View {
                         Text(status).font(.headline)
                         
                         if flight.geography?.altitude != nil  {
-                            let flightPos = CLLocationCoordinate2D(latitude: flightLat,
-                                                                   longitude: flightLong)
-                            
-                            
+                            let flightPos = CLLocationCoordinate2D(latitude: flightLat, longitude: flightLong)
+                            let departurePos = CLLocationCoordinate2D(latitude: departureLat, longitude: departureLong)
+                            let arrivalPos = CLLocationCoordinate2D(latitude: arrivalLat, longitude: arrivalLong)
                             
                             let flightSpan = MKCoordinateSpan(latitudeDelta: latLongDelta, longitudeDelta: latLongDelta)
                             let flightRegion = MKCoordinateRegion(center: flightPos, span: flightSpan)
@@ -109,8 +108,22 @@ struct DetailsView: View {
                                         .resizable()
                                         .imageScale(.large)
                                         .foregroundStyle(.black)
-                                        .shadow(color: .white, radius: 3)
+                                        .shadow(color: .white, radius: 5)
                                         .rotationEffect(Angle(degrees: flightAngle))
+                                }
+                                Annotation(departureIata, coordinate: departurePos) {
+                                    Image(systemName: "airplane.departure")
+                                        .resizable()
+                                        .imageScale(.large)
+                                        .foregroundStyle(.white)
+                                        .shadow(color: .black, radius: 4)
+                                }
+                                Annotation(arrivalIata, coordinate: arrivalPos) {
+                                    Image(systemName: "airplane.arrival")
+                                        .resizable()
+                                        .imageScale(.large)
+                                        .foregroundStyle(.white)
+                                        .shadow(color: .black, radius: 4)
                                 }
                             }
                             .frame(height: 150)
