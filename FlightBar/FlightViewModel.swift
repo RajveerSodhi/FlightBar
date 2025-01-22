@@ -120,16 +120,25 @@ class FlightViewModel: ObservableObject {
     }
 
     func fetchFlightDetails(for flightNumber: String, completion: @escaping () -> Void) {
-        UserDefaults.standard.setValue(flightNumber, forKey: flightNumberKey)
         guard !flightNumber.isEmpty else {
             self.errorMessage = "Please enter a flight number."
+            completion()
             return
         }
         guard isValidFlightNumber(flightNumber) else {
             self.errorMessage = "Please enter a valid IATA flight number."
+            completion()
             return
         }
-
+        
+        let previousFlightNumber = UserDefaults.standard.string(forKey: flightNumberKey)
+        if flightNumber == previousFlightNumber {
+            completion()
+            return
+        }
+        
+        UserDefaults.standard.setValue(flightNumber, forKey: flightNumberKey)
+        
         // Prepare request
         guard let url = URL(string: "\(urlString)?iata=\(flightNumber)") else { return }
 
