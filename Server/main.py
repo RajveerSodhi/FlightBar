@@ -37,39 +37,17 @@ def retry_on_failure(func, retries=3, delay=2, *args, **kwargs):
                 continue
             raise e
 
+async def validate_secret_key(x_key: str = Header(...)):
+    if x_key != REQ_KEY:
+        raise HTTPException(status_code=401, detail="Invalid Secret Key")
+    return x_key
+
 # Root Endpoint
 @app.get("/", include_in_schema=False)
 def root():
     return {
         "redis_conn_status": cache.ping()
     }
-
-'''
-
-To Do:
-
-1. limit calling flight schedule API.
-Call when:
-a) If requested before takeoff
-- Flight is scheduled: get scheduled take off and landing time, keep updating to get estimated times and delay
-- Flight is en-route: get actual take off time (1)
-- Flight has landed: get actual landing time
-b) If requested after takeoff
-
-2. Add notifications for flight status change
-
-3. Custom symbols for flight status
-
-4. Figure out if flight is > 10hours
-
-5. Airline Logo from Ninja API integration
-
-'''
-
-async def validate_secret_key(x_key: str = Header(...)):
-    if x_key != REQ_KEY:
-        raise HTTPException(status_code=401, detail="Invalid Secret Key")
-    return x_key
 
 @app.post("/flight")
 def get_flight_data(iata, key: str = Depends(validate_secret_key)):
@@ -88,8 +66,8 @@ def get_flight_data(iata, key: str = Depends(validate_secret_key)):
             return json.loads(cached_data)
 
         # Flight Schedule Details
-        flight_data = fetch_flight_schedule(iata, "departure")
-        # flight_data = retry_on_failure(fetch_flight_schedule, iata, "departure")
+        # flight_data = fetch_flight_schedule(iata, "departure")
+        flight_data = retry_on_failure(fetch_flight_schedule, 3, 2, *(iata, "departure"))
         print(f"Fetching schedule for {iata} as departure")
         if not flight_data:
             print(f"No data found for departure. Trying arrival for {iata}")
@@ -101,8 +79,8 @@ def get_flight_data(iata, key: str = Depends(validate_secret_key)):
         # Flight Live Details (optional)
         if flight_data["status"] == "active":
             print("fetching flight live details.")
-            # flight_live_details = retry_on_failure(fetch_flight_live_details, iata)
-            flight_live_details = fetch_flight_live_details(iata)
+            flight_live_details = retry_on_failure(fetch_flight_live_details, 3, 2, iata)
+            # flight_live_details = fetch_flight_live_details(iata)
             print("live details function returned!")
 
             flight_data["speed"] = flight_live_details.get("speed", {
@@ -131,8 +109,8 @@ def get_flight_data(iata, key: str = Depends(validate_secret_key)):
                 if cached_airport_data:
                     flight_data[f"{airport_type}"]["persistent"] = json.loads(cached_airport_data)
                 else:
-                    airport_details = fetch_airport_details(airport_iata)
-                    # airport_name = retry_on_failure(fetch_airport_details, airport_iata)
+                    # airport_details = fetch_airport_details(airport_iata)
+                    airport_details = retry_on_failure(fetch_airport_details, 3, 2, airport_iata)
                     if not airport_details:
                         raise HTTPException(status_code=404, detail="Airport details not found")
                     
