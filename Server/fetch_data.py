@@ -107,6 +107,21 @@ def fetch_airport_details(iata_code):
         print(f"Error fetching airport details for {iata_code}: {e}")
         return None
 
+def get_airline_image(iata):
+    airline_url = f"https://api.api-ninjas.com/v1/airlines?iata={iata}"
+    try:
+        response = requests.get(airline_url, headers={'X-Api-Key': AIRPORT_API_KEY}, timeout=timeout)
+        if response.status_code == 200:
+            data = response.json()
+            if isinstance(data, list) and data:
+                airline = data[0]
+                return airline.get("logo_url", "")
+        print(f"Error fetching airline logo for {iata}: {response.status_code}")
+        return None
+    except requests.exceptions.RequestException as e:
+        print(f"Error fetching airport details for {iata}: {e}")
+        return None
+
 def calculate_flying_mins(departure_time, arrival_time, departure_timezone, arrival_timezone):
     departure_dt = datetime.strptime(departure_time, "%Y-%m-%dT%H:%M:%S.%f")
     arrival_dt = datetime.strptime(arrival_time, "%Y-%m-%dT%H:%M:%S.%f")
