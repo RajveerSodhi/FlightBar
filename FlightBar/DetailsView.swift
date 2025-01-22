@@ -1,5 +1,6 @@
 import SwiftUI
 import MapKit
+import Foundation
 
 struct DetailsView: View {
     @State private var flightNumber: String = ""
@@ -8,23 +9,16 @@ struct DetailsView: View {
     func fixAirportName(name: String) -> String {
         let words = name.split(separator: " ")
         let newNameArray: [String] = words.map { word in
-            if word.uppercased() == "INTERNATIONAL" {
-                return "Intl"
-            } else if word.uppercased() == "AIRPORT" {
-                return "Airp."
-            } else {
-                return String(word)
-            }
+            if word.uppercased() == "INTERNATIONAL" { return "Intl" }
+            else if word.uppercased() == "AIRPORT" { return "Airp." }
+            else { return String(word) }
         }
         
         return newNameArray.joined(separator: " ")
     }
         
     func fixTime(dateTime: String) -> String {
-        
-        if dateTime == "N/A" {
-            return dateTime
-        }
+        if dateTime == "N/A" { return dateTime }
         
         var time = dateTime.split(separator: "T")[1]
         time = time.split(separator: "+")[0]
@@ -32,7 +26,26 @@ struct DetailsView: View {
         
         return String(newTime)
     }
-
+    
+    func timeAgo(timestamp: String) -> String {
+        let formatter = DateFormatter()
+        formatter.dateFormat = "yyyy-MM-dd HH:mm:ss.SSSSSSXXX"
+        formatter.timeZone = TimeZone(identifier: "UTC")
+        
+        guard let utcDate = formatter.date(from: timestamp) else {
+            return "Invalid timestamp"
+        }
+        
+        let now = Date()
+        
+        // Calculate the difference in minutes
+        let timeDifference = Int(now.timeIntervalSince(utcDate)) / 60
+        if timeDifference < 1 {
+            return "Last updated: just now"
+        } else {
+            return "Last updated: \(timeDifference) minutes ago"
+        }
+    }
     
     var body: some View {
         VStack(alignment: .center, spacing: 10) {
@@ -50,6 +63,7 @@ struct DetailsView: View {
                 let arrivalScheduled = fixTime(dateTime: flight.arrival.scheduledTime ?? "N/A")
                 let arrivalEstimated = fixTime(dateTime: flight.arrival.estimatedTime ?? "N/A")
                 let arrivalActual = fixTime(dateTime: flight.arrival.actualTime ?? "N/A")
+                let lastUpdatedText = timeAgo(timestamp: flight.timestamp)
 
                     VStack {
                         Text("\(airline) - \(flightNo)").font(.title2)
@@ -153,6 +167,9 @@ struct DetailsView: View {
                                 .foregroundColor(.gray)
                                 .padding(5)
                         }
+                        Text(lastUpdatedText)
+                            .foregroundColor(.gray)
+                            .italic(true)
                     }
                 }
             else {
@@ -165,11 +182,14 @@ struct DetailsView: View {
             HStack {
                 TextField("Flight Number", text: $flightNumber)
                     .textFieldStyle(RoundedBorderTextFieldStyle())
+                    .autocorrectionDisabled(true)
                     .padding(.trailing, 5)
                     .onSubmit {
+                        flightNumber = flightNumber.uppercased()
                         flightViewModel.startAutoRefresh(flightNumber: flightNumber)
                     }
                 Button(action: {
+                    flightNumber = flightNumber.uppercased()
                     flightViewModel.startAutoRefresh(flightNumber: flightNumber)
                 }) {
                     Image(systemName: "magnifyingglass")

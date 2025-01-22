@@ -10,10 +10,11 @@ struct FlightInfo: Codable {
     let status: String
     let speed: Speed?
     let geography: Geography?
+    let timestamp: String
 
     enum CodingKeys: String, CodingKey {
         case flightNo = "flight_no"
-        case airline, departure, arrival, status, speed, geography
+        case airline, departure, arrival, status, speed, geography, timestamp
     }
 }
 
