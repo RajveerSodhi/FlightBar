@@ -1,13 +1,14 @@
 from os import getenv
 from datetime import datetime, timezone
 import json
-# from dotenv import load_dotenv
+import time
+from dotenv import load_dotenv
 from fastapi import Depends, FastAPI, HTTPException, Header
 from fastapi.middleware.cors import CORSMiddleware
 from fetch_data import fetch_flight_schedule, fetch_airport_name, fetch_flight_live_details, calculate_flying_hours
 from redis_client import cache
 
-# load_dotenv()
+load_dotenv()
 REQ_KEY = getenv('REQ_KEY')
 
 app = FastAPI(
@@ -25,6 +26,16 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
+
+def retry_on_failure(func, retries=3, delay=2, *args, **kwargs):
+    for attempt in range(retries):
+        try:
+            return func(*args, **kwargs)
+        except Exception as e:
+            if attempt < retries - 1:
+                time.sleep(delay)
+                continue
+            raise e
 
 # Root Endpoint
 @app.get("/", include_in_schema=False)
@@ -77,7 +88,8 @@ def get_flight_data(iata, key: str = Depends(validate_secret_key)):
             return json.loads(cached_data)
 
         # Flight Schedule Details
-        flight_data = fetch_flight_schedule(iata, "departure")
+        # flight_data = fetch_flight_schedule(iata, "departure")
+        flight_data = retry_on_failure(fetch_flight_schedule, iata, "departure")
         print(f"Fetching schedule for {iata} as departure")
         if not flight_data:
             print(f"No data found for departure. Trying arrival for {iata}")
@@ -97,7 +109,8 @@ def get_flight_data(iata, key: str = Depends(validate_secret_key)):
         # Flight Live Details (optional)
         if flight_data["status"] == "active":
             print("fetching flight live details.")
-            flight_live_details = fetch_flight_live_details(iata)
+            flight_live_details = retry_on_failure(fetch_flight_live_details, iata)
+            # flight_live_details = fetch_flight_live_details(iata)
             print("live details function returned!")
 
             flight_data["speed"] = flight_live_details.get("speed", {
@@ -126,7 +139,8 @@ def get_flight_data(iata, key: str = Depends(validate_secret_key)):
                 if cached_airport_data:
                     flight_data[f"{airport_type}"]["name"] = json.loads(cached_airport_data)
                 else:
-                    airport_name = fetch_airport_name(airport_iata)
+                    # airport_name = fetch_airport_name(airport_iata)
+                    airport_name = retry_on_failure(fetch_airport_name, airport_iata)
                     if not airport_name:
                         raise HTTPException(status_code=404, detail="Airport details not found")
                     
