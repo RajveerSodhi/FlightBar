@@ -59,9 +59,11 @@ struct Geography: Codable {
 class FlightViewModel: ObservableObject {
     @Published var flight: FlightInfo?
     @Published var errorMessage: String?
-    private var flightStatus: String? = "scheduled"
+    private var flightStatus: String? = nil
     private let flightNumberKey = "storedFlightNumber"
     private var timer: Timer?
+    private let urlString = "https://flightbar-55ccda97cd11.herokuapp.com/flight"
+    private let testUrlString = "https://flightbar-55ccda97cd11.herokuapp.com/test"
 
     var storedFlightNumber: String {
         UserDefaults.standard.string(forKey: flightNumberKey) ?? ""
@@ -72,6 +74,34 @@ class FlightViewModel: ObservableObject {
         let regex = try? NSRegularExpression(pattern: pattern, options: .caseInsensitive)
         let range = NSRange(location: 0, length: flightNumber.utf16.count)
         return regex?.firstMatch(in: flightNumber, options: [], range: range) != nil
+    }
+    
+    func showStatusNotification(_ flightStatus: String) {
+        if self.flightStatus == nil {
+            self.flightStatus = flightStatus
+        }
+        
+        if self.flightStatus != flightStatus {
+            self.flightStatus = flightStatus
+            UNUserNotificationCenter.current().requestAuthorization(options: [.alert]) { success, error in
+                if success {
+                    print("Notifications authorized")
+                } else if let error {
+                    print(error.localizedDescription)
+                }
+            }
+            
+            let content = UNMutableNotificationContent()
+            content.title="Flight Status Change"
+            content.subtitle="There is an update"
+            content.sound = UNNotificationSound.default
+            
+            let trigger = UNTimeIntervalNotificationTrigger(timeInterval: 1, repeats: false)
+            
+            let request = UNNotificationRequest(identifier: UUID().uuidString, content: content, trigger: trigger)
+            
+            UNUserNotificationCenter.current().add(request)
+        }
     }
 
     func fetchFlightDetails(for flightNumber: String) {
@@ -84,14 +114,18 @@ class FlightViewModel: ObservableObject {
             self.errorMessage = "Please enter a valid IATA flight number."
             return
         }
-
-        let urlString = "https://flightbar-55ccda97cd11.herokuapp.com/flight?iata=\(flightNumber)"
-        let testUrlString = "https://flightbar-55ccda97cd11.herokuapp.com/test"
         
-        guard let url = URL(string: urlString) else { return }
+        // Prepare request
+        guard let url = URL(string: "\(urlString)?iata=\(flightNumber)") else { return }
+
+        var request = URLRequest(url: url)
+        request.httpMethod = "POST"
+        request.setValue("application/json", forHTTPHeaderField: "Content-Type")
+        request.setValue("FB-secret-key-0", forHTTPHeaderField: "x-key")
 
         self.errorMessage = nil
-        URLSession.shared.dataTask(with: url) { data, response, error in
+        
+        URLSession.shared.dataTask(with: request) { data, response, error in
             DispatchQueue.main.async {
                 if let error = error {
                     self.errorMessage = "Error: \(error.localizedDescription)"
@@ -106,36 +140,12 @@ class FlightViewModel: ObservableObject {
                     self.flight = flight
                     self.errorMessage = nil
                     
-                    if self.flightStatus == nil {
-                        self.flightStatus = flight.status
-                    }
-                    
-                    if self.flightStatus != flight.status {
-                        self.flightStatus = flight.status
-                        UNUserNotificationCenter.current().requestAuthorization(options: [.alert]) { success, error in
-                            if success {
-                                print("Notifications authorized")
-                            } else if let error {
-                                print(error.localizedDescription)
-                            }
-                        }
-                        
-                        let content = UNMutableNotificationContent()
-                        content.title="Flight Status Change"
-                        content.subtitle="There is an update"
-                        content.sound = UNNotificationSound.default
-                        
-                        let trigger = UNTimeIntervalNotificationTrigger(timeInterval: 1, repeats: false)
-                        
-                        let request = UNNotificationRequest(identifier: UUID().uuidString, content: content, trigger: trigger)
-                        
-                        UNUserNotificationCenter.current().add(request)
-                    }
+                    self.showStatusNotification(flight.status)
 
                     // Check if flight status is "Landed"
                     if flight.status.lowercased() == "landed" {
                         self.stopAutoRefresh()
-                        self.flightStatus = "scheduled"
+                        self.flightStatus = nil
                     }
                 } catch {
                     self.errorMessage = "Could not get flight data. Try again."
