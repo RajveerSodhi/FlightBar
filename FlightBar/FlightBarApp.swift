@@ -18,5 +18,9 @@ struct FlightBarApp: App {
                 .environmentObject(flightViewModel)
         }
         .menuBarExtraStyle(.window)
+    
+        Settings {
+            SettingsView()
+        }
     }
 }

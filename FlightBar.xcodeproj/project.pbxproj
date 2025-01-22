@@ -3,7 +3,7 @@
 	archiveVersion = 1;
 	classes = {
 	};
-	objectVersion = 56;
+	objectVersion = 70;
 	objects = {
 
 /* Begin PBXBuildFile section */
@@ -30,6 +30,10 @@
 		5585F20A2C222FC500F20A4B /* MenuBarView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MenuBarView.swift; sourceTree = "<group>"; };
 		5585F20C2C22300000F20A4B /* DetailsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DetailsView.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
+
+/* Begin PBXFileSystemSynchronizedRootGroup section */
+		55DB1E612D40FC5500E0E5A0 /* Settings */ = {isa = PBXFileSystemSynchronizedRootGroup; explicitFileTypes = {}; explicitFolders = (); path = Settings; sourceTree = "<group>"; };
+/* End PBXFileSystemSynchronizedRootGroup section */
 
 /* Begin PBXFrameworksBuildPhase section */
 		550FB6052C20C9D300CAF47F /* Frameworks */ = {
@@ -61,6 +65,7 @@
 		550FB60A2C20C9D300CAF47F /* FlightBar */ = {
 			isa = PBXGroup;
 			children = (
+				55DB1E612D40FC5500E0E5A0 /* Settings */,
 				550FB61C2C21543A00CAF47F /* Info.plist */,
 				550FB60B2C20C9D300CAF47F /* FlightBarApp.swift */,
 				550FB60D2C20C9D300CAF47F /* ContentView.swift */,
@@ -97,6 +102,9 @@
 			buildRules = (
 			);
 			dependencies = (
+			);
+			fileSystemSynchronizedGroups = (
+				55DB1E612D40FC5500E0E5A0 /* Settings */,
 			);
 			name = FlightBar;
 			productName = FlightBar;

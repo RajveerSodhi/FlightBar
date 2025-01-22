@@ -103,7 +103,7 @@ def get_flight_data(iata, key: str = Depends(validate_secret_key)):
 
             # Update status if needed
             if flight_data["geography"]["altitude"] == 0 and flight_data["speed"]["horizontal"] == 0:
-                flight_data["status"] = "Landed"
+                flight_data["status"] = "landed"
 
         # Airport Details
         for airport_type in ["arrival", "departure"]:
