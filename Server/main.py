@@ -134,7 +134,7 @@ def get_flight_data(iata, key: str = Depends(validate_secret_key)):
                     cache.set(f"AIRPORT_{airport_iata}", json.dumps(airport_name))
         print("airports found!")
 
-        timestamp = datetime.now(timezone.utc).time()
+        timestamp = datetime.now(timezone.utc)
         flight_data["timestamp"] = str(timestamp)
 
         cache.setex(f"FLIGHT_{iata}", cache_ttl_secs, json.dumps(flight_data))
