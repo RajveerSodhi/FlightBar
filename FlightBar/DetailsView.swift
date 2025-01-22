@@ -243,7 +243,6 @@ struct DetailsView: View {
                     }
                 }) {
                     if flightNumber != "" && isLoaded != true {
-//                        Image(systemName: "circle.dotted")
                         ProgressView()
                             .scaleEffect(0.5)
                             .frame(width: 18, height: 18)

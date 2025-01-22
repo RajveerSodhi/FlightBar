@@ -101,6 +101,10 @@ def get_flight_data(iata, key: str = Depends(validate_secret_key)):
             }
             print("live details found!")
 
+            # Update status if needed
+            if flight_data["geography"]["altitude"] == 0 and flight_data["speed"]["horizontal"] == 0:
+                flight_data["status"] = "Landed"
+
         # Airport Details
         for airport_type in ["arrival", "departure"]:
             airport_iata = flight_data.get(airport_type).get("iata")
