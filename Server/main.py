@@ -138,12 +138,12 @@ def get_flight_data(iata, key: str = Depends(validate_secret_key)):
 
         flight_data["flight_mins"] = flight_mins
 
-        cache.setex(f"FLIGHT_{iata}", cache_ttl_secs, json.dumps(flight_data))
+        cache.set(f"FLIGHT_{iata}", json.dumps(flight_data), ex=cache_ttl_secs, nx=True)
 
         return flight_data
 
     except Exception as e:
-        raise HTTPException(status_code=500, detail=f"Unexpected Error: {str(e)}")
+        raise HTTPException(status_code=500, detail=f"Unexpected Error: {str(e)}") from e
 
 @app.get("/test")
 def get_test():
