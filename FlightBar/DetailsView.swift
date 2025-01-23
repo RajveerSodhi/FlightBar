@@ -83,6 +83,7 @@ struct DetailsView: View {
                     let departureIata = flight.departure.iata.uppercased()
                     let departureLat = flight.departure.persistent.latitude
                     let departureLong = flight.departure.persistent.longitude
+                    let departureDelay = flight.departure.delay ?? 0
                     
                     // Arrival Airport info
                     let arrivalName = fixAirportName(name: flight.arrival.persistent.name)
@@ -92,6 +93,7 @@ struct DetailsView: View {
                     let arrivalIata = flight.arrival.iata.uppercased()
                     let arrivalLat = flight.arrival.persistent.latitude
                     let arrivalLong = flight.arrival.persistent.longitude
+                    let arrivalDelay = flight.arrival.delay ?? 0
                     
                     // Flight Map info
                     let flightLat = flight.geography?.latitude ?? 49.884491
@@ -164,6 +166,10 @@ struct DetailsView: View {
                                             Text("ESTD").font(.caption).foregroundColor(.gray)
                                         }
                                     }
+                                    if departureDelay != 0 {
+                                        Text("+\(departureDelay)")
+                                            .foregroundColor(.red)
+                                    }
                                 }
                             }
                             
@@ -188,6 +194,12 @@ struct DetailsView: View {
                                             Text("ESTD").font(.caption).foregroundColor(.gray)
                                         }
                                     }
+                                    
+                                    if arrivalDelay != 0 {
+                                        Text("+\(arrivalDelay)")
+                                            .foregroundColor(.red)
+                                    }
+                                }
                                 }
                             }
                         }
