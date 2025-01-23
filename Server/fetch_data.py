@@ -23,6 +23,8 @@ def fetch_flight_schedule(flight_iata, type):
             
             if data:
                 flight = data[0]
+                departure_delay = flight.get("departure", {}).get("delay")
+                arrival_delay = flight.get("arrival", {}).get("delay")
                 return {
                     "flight_no": flight.get("flight", {}).get("iataNumber"),
                     "airline": {
@@ -34,14 +36,14 @@ def fetch_flight_schedule(flight_iata, type):
                         "scheduled_time": flight.get("departure", {}).get("scheduledTime"),
                         "estimated_time": flight.get("departure", {}).get("estimatedTime"),
                         "actual_time": flight.get("departure", {}).get("actualTime"),
-                        "delay": int(flight.get("departure", {}).get("delay")),
+                        "delay": int(departure_delay) if departure_delay is not None else None,
                     },
                     "arrival": {
                         "iata": flight.get("arrival", {}).get("iataCode"),
                         "scheduled_time": flight.get("arrival", {}).get("scheduledTime"),
                         "estimated_time": flight.get("arrival", {}).get("estimatedTime"),
                         "actual_time": flight.get("arrival", {}).get("actualTime"),
-                        "delay": int(flight.get("arrival", {}).get("delay")),
+                        "delay": int(arrival_delay) if arrival_delay is not None else None,
                     },
                     "status": flight.get("status"),
                 }
