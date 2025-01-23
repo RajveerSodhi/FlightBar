@@ -151,7 +151,7 @@ def get_flight_data(iata, key: str = Depends(validate_secret_key)):
 
         flight_data["flight_mins"] = flight_mins
 
-        cache.set(f"FLIGHT_{iata}", json.dumps(flight_data), ex=cache_ttl_secs, nx=True)
+        cache.set(f"FLIGHT_{iata}", json.dumps(flight_data), ex=cache_ttl_secs)
 
         return flight_data
 
