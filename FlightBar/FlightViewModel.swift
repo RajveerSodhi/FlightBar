@@ -3,7 +3,7 @@ import UserNotifications
 import Network
 
 // MARK: - FlightInfo
-struct FlightInfo: Codable {
+struct FlightInfo: Codable, Equatable {
     let flightNo: String
     let airline: Airline
     let departure: Airport
@@ -22,13 +22,13 @@ struct FlightInfo: Codable {
 }
 
 // MARK: - Airline
-struct Airline: Codable {
+struct Airline: Codable, Equatable {
     let iata: String
     let name: String
 }
 
 // MARK: - Airport
-struct Airport: Codable {
+struct Airport: Codable, Equatable {
     let iata: String
     let scheduledTime: String?
     let estimatedTime: String?
@@ -45,7 +45,7 @@ struct Airport: Codable {
 }
 
 // MARK: - Persistent Airport
-struct Persistent: Codable {
+struct Persistent: Codable, Equatable {
     let latitude: Double
     let longitude: Double
     let country: String
@@ -58,13 +58,13 @@ struct Persistent: Codable {
 }
 
 // MARK: - Speed
-struct Speed: Codable {
+struct Speed: Codable, Equatable {
     let vertical: Double?
     let horizontal: Double?
 }
 
 // MARK: - Geography
-struct Geography: Codable {
+struct Geography: Codable, Equatable {
     let altitude: Double?
     let direction: Double?
     let latitude: Double?
@@ -208,7 +208,7 @@ class FlightViewModel: ObservableObject {
         let timer_mins: Double = 24
         let timer_secs: Double = timer_mins * 60
 
-        timer = Timer.scheduledTimer(withTimeInterval: 6, repeats: true) { [weak self] _ in
+        timer = Timer.scheduledTimer(withTimeInterval: timer_secs, repeats: true) { [weak self] _ in
             self?.fetchFlightDetails(for: flightNumber, isAutoRefresh: true, completion: completion)
             print("function called again!")
         }

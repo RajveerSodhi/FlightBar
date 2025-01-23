@@ -9,6 +9,8 @@ struct DetailsView: View {
     @State private var flightNickname: String = ""
     @State private var recentlyTrackedFlights: [String] = UserDefaults.standard.array(forKey: "RecentlyTrackedFlights") as? [String] ?? []
     @State private var lastSearchedFlightNumber: String = ""
+    @State private var flightRegion = MKCoordinateRegion(center: .init(latitude: 49.884491, longitude: -119.493500), span: .init(latitudeDelta: 1.25, longitudeDelta: 1.25))
+    @State private var flightCamera: MapCameraPosition = .region(MKCoordinateRegion(center: .init(latitude: 49.884491, longitude: -119.493500), span: .init(latitudeDelta: 1.25, longitudeDelta: 1.25)))
     @EnvironmentObject var flightViewModel: FlightViewModel
     
     private func setNickname(_ nickname: String) {
@@ -183,9 +185,6 @@ struct DetailsView: View {
                             let arrivalPos = CLLocationCoordinate2D(latitude: arrivalLat, longitude: arrivalLong)
                             
                             let flightSpan = MKCoordinateSpan(latitudeDelta: latLongDelta, longitudeDelta: latLongDelta)
-                            let flightRegion = MKCoordinateRegion(center: flightPos, span: flightSpan)
-                            
-                            @State var flightCamera: MapCameraPosition = .region(flightRegion)
                             
                             Map(position: $flightCamera) {
                                 Annotation(flightNo, coordinate: flightPos) {
@@ -213,6 +212,14 @@ struct DetailsView: View {
                             }
                             .frame(height: 150)
                             .cornerRadius(15)
+                            .onAppear {
+                                flightRegion = MKCoordinateRegion(center: flightPos, span: flightSpan)
+                                flightCamera = .region(flightRegion)
+                            }
+                            .onChange(of: flightViewModel.flight) { oldFlight, newFlight in
+                                flightRegion = MKCoordinateRegion(center: flightPos, span: flightSpan)
+                                flightCamera = .region(flightRegion)
+                            }
                         } else {
                         }
                         
