@@ -47,15 +47,30 @@ class SettingsManager: ObservableObject {
             UserDefaults.standard.set(showRoute, forKey: "showRoute")
         }
     }
+    
+    @Published var showIata: Bool {
+        didSet {
+            UserDefaults.standard.set(showIata, forKey: "showIata")
+        }
+    }
+    
+    @Published var showStatus: Bool {
+        didSet {
+            UserDefaults.standard.set(showStatus, forKey: "showStatus")
+        }
+    }
 
     private init() {
-        self.showDockIcon = UserDefaults.standard.bool(forKey: "ShowDockIcon")
-        self.showNotifications = UserDefaults.standard.bool(forKey: "showNotifications")
+        let defaults = UserDefaults.standard
         
-        self.showInMenuBar = UserDefaults.standard.bool(forKey: "showInMenuBar")
-        self.showStatusIcons = UserDefaults.standard.bool(forKey: "showStatusIcons")
-        self.showAirline = UserDefaults.standard.bool(forKey: "showAirline")
-        self.showRoute = UserDefaults.standard.bool(forKey: "showRoute")
+        self.showDockIcon = defaults.object(forKey: "ShowDockIcon") as? Bool ?? true
+        self.showNotifications = defaults.object(forKey: "showNotifications") as? Bool ?? true
+        self.showInMenuBar = defaults.object(forKey: "showInMenuBar") as? Bool ?? true
+        self.showStatusIcons = defaults.object(forKey: "showStatusIcons") as? Bool ?? true
+        self.showAirline = defaults.object(forKey: "showAirline") as? Bool ?? false
+        self.showRoute = defaults.object(forKey: "showRoute") as? Bool ?? false
+        self.showIata = defaults.object(forKey: "showIata") as? Bool ?? true
+        self.showStatus = defaults.object(forKey: "showStatus") as? Bool ?? true
     }
 }
 
