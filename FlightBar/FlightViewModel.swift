@@ -32,7 +32,7 @@ struct Airport: Codable {
     let scheduledTime: String?
     let estimatedTime: String?
     let actualTime: String?
-    let delay: String?
+    let delay: Int?
     let persistent: Persistent
 
     enum CodingKeys: String, CodingKey {
