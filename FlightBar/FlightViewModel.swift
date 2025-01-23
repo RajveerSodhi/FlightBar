@@ -92,30 +92,32 @@ class FlightViewModel: ObservableObject {
     }
     
     func showStatusNotification(_ flightStatus: String) {
-        if self.flightStatus == nil {
-            self.flightStatus = flightStatus
-        }
-        
-        if self.flightStatus != flightStatus {
-            self.flightStatus = flightStatus
-            UNUserNotificationCenter.current().requestAuthorization(options: [.alert]) { success, error in
-                if success {
-                    print("Notifications authorized")
-                } else if let error {
-                    print(error.localizedDescription)
-                }
+        if SettingsManager.shared.showNotifications {
+            if self.flightStatus == nil {
+                self.flightStatus = flightStatus
             }
             
-            let content = UNMutableNotificationContent()
-            content.title="Flight Status Change"
-            content.subtitle="There is an update"
-            content.sound = UNNotificationSound.default
-            
-            let trigger = UNTimeIntervalNotificationTrigger(timeInterval: 1, repeats: false)
-            
-            let request = UNNotificationRequest(identifier: UUID().uuidString, content: content, trigger: trigger)
-            
-            UNUserNotificationCenter.current().add(request)
+            if self.flightStatus != flightStatus {
+                self.flightStatus = flightStatus
+                UNUserNotificationCenter.current().requestAuthorization(options: [.alert]) { success, error in
+                    if success {
+                        print("Notifications authorized")
+                    } else if let error {
+                        print(error.localizedDescription)
+                    }
+                }
+                
+                let content = UNMutableNotificationContent()
+                content.title="Flight Status Change"
+                content.subtitle="There is an update"
+                content.sound = UNNotificationSound.default
+                
+                let trigger = UNTimeIntervalNotificationTrigger(timeInterval: 1, repeats: false)
+                
+                let request = UNNotificationRequest(identifier: UUID().uuidString, content: content, trigger: trigger)
+                
+                UNUserNotificationCenter.current().add(request)
+            }
         }
     }
 
