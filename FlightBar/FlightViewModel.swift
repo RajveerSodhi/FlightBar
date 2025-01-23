@@ -133,7 +133,7 @@ class FlightViewModel: ObservableObject {
         }
     }
 
-    func fetchFlightDetails(for flightNumber: String, completion: @escaping () -> Void) {
+    func fetchFlightDetails(for flightNumber: String, isAutoRefresh: Bool = false, completion: @escaping () -> Void) {
         guard !flightNumber.isEmpty else {
             self.errorMessage = "Please enter a flight number."
             completion()
@@ -151,11 +151,13 @@ class FlightViewModel: ObservableObject {
             return
         }
         
-        let previousFlightNumber = UserDefaults.standard.string(forKey: flightNumberKey)
-        if flightNumber == previousFlightNumber {
-            print("same flight number called again")
-            completion()
-            return
+        if !isAutoRefresh {
+            let previousFlightNumber = UserDefaults.standard.string(forKey: flightNumberKey)
+            if flightNumber == previousFlightNumber {
+                print("same flight number called again")
+                completion()
+                return
+            }
         }
         
         UserDefaults.standard.setValue(flightNumber, forKey: flightNumberKey)
@@ -206,12 +208,12 @@ class FlightViewModel: ObservableObject {
         let timer_mins: Double = 24
         let timer_secs: Double = timer_mins * 60
 
-        timer = Timer.scheduledTimer(withTimeInterval: timer_secs, repeats: true) { [weak self] _ in
-            self?.fetchFlightDetails(for: flightNumber, completion: completion)
+        timer = Timer.scheduledTimer(withTimeInterval: 6, repeats: true) { [weak self] _ in
+            self?.fetchFlightDetails(for: flightNumber, isAutoRefresh: true, completion: completion)
+            print("function called again!")
         }
         
-        fetchFlightDetails(for: flightNumber, completion: completion)
-        print("function called again!")
+        fetchFlightDetails(for: flightNumber, isAutoRefresh: true, completion: completion)
     }
 
     func stopAutoRefresh() {

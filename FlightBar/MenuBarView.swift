@@ -25,12 +25,13 @@ struct MenuBarView: View {
                 let departureIata = flight.departure.iata
                 let arrivalIata = flight.arrival.iata
                 let route = "\(departureIata) → \(arrivalIata)"
+                let nickname = UserDefaults.standard.string(forKey: "flightNickname") ?? ""
                 
                 if settings.showInMenuBar {
                     let flightDetails = [
                         settings.showAirline ? airline : nil,
                         settings.showRoute ? route : nil,
-                        settings.showIata ? flightNo : nil
+                        settings.showIata ? ((settings.useNickname && nickname != "") ? nickname : flightNo) : nil
                     ]
                         .compactMap { $0 }
                         .joined(separator: " | ")

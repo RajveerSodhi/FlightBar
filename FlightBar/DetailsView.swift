@@ -5,21 +5,35 @@ import Foundation
 struct DetailsView: View {
     @State private var flightNumber: String = ""
     @State private var isLoaded: Bool = true
+    @State private var tempNickname: String = ""
+    @State private var flightNickname: String = ""
     @State private var recentlyTrackedFlights: [String] = UserDefaults.standard.array(forKey: "RecentlyTrackedFlights") as? [String] ?? []
+    @State private var lastSearchedFlightNumber: String = ""
     @EnvironmentObject var flightViewModel: FlightViewModel
     
+    private func setNickname(_ nickname: String) {
+        flightNickname = nickname
+        UserDefaults.standard.set(nickname, forKey: "flightNickname")
+    }
+
+    private func removeNickname() {
+        flightNickname = ""
+        UserDefaults.standard.removeObject(forKey: "flightNickname")
+    }
+    
     private func addFlightToRecentHistory(_ flight: String) {
-        print("adding to history")
+        print("add to history fn")
         var updatedHistory = recentlyTrackedFlights
-        print(updatedHistory)
-        updatedHistory.removeAll { $0 == flight }
-        updatedHistory.insert(flight, at: 0)
-        if updatedHistory.count > 5 {
-            updatedHistory.removeLast()
+        if updatedHistory[0] != flight {
+            print("adding to history")
+            updatedHistory.removeAll { $0 == flight }
+            updatedHistory.insert(flight, at: 0)
+            if updatedHistory.count > 8 {
+                updatedHistory.removeLast()
+            }
+            recentlyTrackedFlights = updatedHistory
+            UserDefaults.standard.set(updatedHistory, forKey: "RecentlyTrackedFlights")
         }
-        recentlyTrackedFlights = updatedHistory
-        print(updatedHistory)
-        UserDefaults.standard.set(updatedHistory, forKey: "RecentlyTrackedFlights")
     }
     
     private func removeFlightFromRecentHistory(_ flight: String) {
@@ -27,7 +41,7 @@ struct DetailsView: View {
         UserDefaults.standard.set(recentlyTrackedFlights, forKey: "RecentlyTrackedFlights")
     }
 
-    func fixAirportName(name: String) -> String {
+    private func fixAirportName(name: String) -> String {
         let words = name.split(separator: " ")
         let newNameArray: [String] = words.map { word in
             if word.uppercased() == "INTERNATIONAL" { return "Intl" }
@@ -38,7 +52,7 @@ struct DetailsView: View {
         return newNameArray.joined(separator: " ")
     }
         
-    func fixTime(dateTime: String) -> String {
+    private func fixTime(dateTime: String) -> String {
         if dateTime == "N/A" { return dateTime }
         
         var time = dateTime.split(separator: "T")[1]
@@ -48,14 +62,14 @@ struct DetailsView: View {
         return String(newTime)
     }
     
-    func flightTime(flightMins: Int) -> String {
+    private func flightTime(flightMins: Int) -> String {
         let hours = Int(flightMins / 60)
         let mins = flightMins % 60
         
         return "\(hours)h \(mins)m"
     }
     
-    func timeAgo(timestamp: String) -> String {
+    private func timeAgo(timestamp: String) -> String {
         let formatter = DateFormatter()
         formatter.dateFormat = "yyyy-MM-dd HH:mm:ss.SSSSSSXXX"
         formatter.timeZone = TimeZone(identifier: "UTC")
@@ -75,6 +89,21 @@ struct DetailsView: View {
         }
     }
     
+    private func searchFlight() {
+        flightNumber = flightNumber.uppercased()
+        isLoaded = false
+
+        if flightNumber != lastSearchedFlightNumber {
+            removeNickname()
+        }
+
+        flightViewModel.startAutoRefresh(flightNumber: flightNumber) {
+            isLoaded = true
+            addFlightToRecentHistory(flightNumber)
+            lastSearchedFlightNumber = flightNumber
+        }
+    }
+    
 // Layout
     
     var body: some View {
@@ -85,6 +114,29 @@ struct DetailsView: View {
                     .multilineTextAlignment(.center)
                     .padding(5)
                 } else if let flight = flightViewModel.flight {
+                    
+                // Add flight nickname
+                    HStack {
+                        TextField("Give it a name", text: $tempNickname)
+                            .textFieldStyle(RoundedBorderTextFieldStyle())
+                            .autocorrectionDisabled(true)
+                            .disabled(!isLoaded)
+                            .padding(.trailing, 5)
+                            .onSubmit {
+                                setNickname(tempNickname)
+                            }
+                        
+                        Button(action: {
+                            setNickname(tempNickname)
+                        }) {
+                            Image(systemName: "checkmark")
+                                .frame(width: 18, height: 18)
+                        }
+                    }
+                    
+                    if !flightNickname.isEmpty {
+                        Text("Nickname: \(flightNickname)")
+                    }
                     
                     // Misc flight info
                     let airline = flight.airline.name.capitalized
@@ -268,20 +320,10 @@ struct DetailsView: View {
                     .disabled(!isLoaded)
                     .padding(.trailing, 5)
                     .onSubmit {
-                        flightNumber = flightNumber.uppercased()
-                        isLoaded = false
-                        flightViewModel.startAutoRefresh(flightNumber: flightNumber) {
-                            isLoaded = true
-                            addFlightToRecentHistory(flightNumber)
-                        }
+                        searchFlight()
                     }
                 Button(action: {
-                    flightNumber = flightNumber.uppercased()
-                    isLoaded = false
-                    flightViewModel.startAutoRefresh(flightNumber: flightNumber) {
-                        isLoaded = true
-                        addFlightToRecentHistory(flightNumber)
-                    }
+                    searchFlight()
                 }) {
                     if flightNumber != "" && isLoaded != true {
                         ProgressView()
@@ -313,8 +355,14 @@ struct DetailsView: View {
                                     Button(action: {
                                         flightNumber = flight
                                         isLoaded = false
+                                        
+                                        if flightNumber != lastSearchedFlightNumber {
+                                            removeNickname()
+                                        }
+                                        
                                         flightViewModel.startAutoRefresh(flightNumber: flight) {
                                             isLoaded = true
+                                            lastSearchedFlightNumber = flightNumber
                                         }
                                     }) {
                                         Text(flight)

@@ -59,6 +59,12 @@ class SettingsManager: ObservableObject {
             UserDefaults.standard.set(showStatus, forKey: "showStatus")
         }
     }
+    
+    @Published var useNickname: Bool {
+        didSet {
+            UserDefaults.standard.set(useNickname, forKey: "useNickname")
+        }
+    }
 
     private init() {
         let defaults = UserDefaults.standard
@@ -71,6 +77,7 @@ class SettingsManager: ObservableObject {
         self.showRoute = defaults.object(forKey: "showRoute") as? Bool ?? false
         self.showIata = defaults.object(forKey: "showIata") as? Bool ?? true
         self.showStatus = defaults.object(forKey: "showStatus") as? Bool ?? true
+        self.useNickname = defaults.object(forKey: "useNickname") as? Bool ?? true
     }
 }
 

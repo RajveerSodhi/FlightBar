@@ -16,6 +16,11 @@ struct AppearanceSettingsView: View {
                 .toggleStyle(.checkbox)
             Toggle("Use Dynamic Icons based on Status", isOn: $settings.showStatusIcons)
                 .toggleStyle(.checkbox)
+            Toggle("Use Nickname instead of Flight No. in Menu Bar", isOn: $settings.useNickname)
+                .toggleStyle(.checkbox)
+            
+            Divider()
+            
             Toggle("Show Airline Name in Menu Bar", isOn: $settings.showAirline)
                 .toggleStyle(.checkbox)
                 .disabled(!settings.showInMenuBar)
