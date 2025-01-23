@@ -9,18 +9,41 @@ import SwiftUI
 
 struct MenuBarView: View {
     @EnvironmentObject var flightViewModel: FlightViewModel
+    @ObservedObject var settings = SettingsManager.shared
 
     var body: some View {
+        
         HStack {
             Image("flightbar_menu")
                 .resizable()
                 .frame(width: 14, height: 14)
-
+            
             if let flight = flightViewModel.flight {
                 let status = flight.status.capitalized
                 let flightNo = flight.flightNo.uppercased()
-
-                Text(" \(flightNo) - \(status)")
+                let airline = flight.airline.name.capitalized
+                let departureIata = flight.departure.iata
+                let arrivalIata = flight.arrival.iata
+                let route = "\(departureIata) → \(arrivalIata)"
+                
+                if settings.showInMenuBar {
+                    let flightDetails = [
+                        settings.showAirline ? airline : nil,
+                        settings.showRoute ? route : nil,
+                        settings.showIata ? flightNo : nil
+                    ]
+                        .compactMap { $0 }
+                        .joined(separator: " | ")
+                    
+                    let menuText = [
+                        flightDetails,
+                        settings.showStatus ? status : nil
+                    ]
+                        .compactMap { $0 }
+                        .joined(separator: " - ")
+                    
+                    Text(menuText)
+                }
             } else {
                 Text(" Load Flight Details")
             }

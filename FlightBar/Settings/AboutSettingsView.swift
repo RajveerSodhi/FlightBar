@@ -18,7 +18,7 @@ struct AboutSettingsView: View {
                     .font(.largeTitle)
                     .fontWeight(.bold)
             }
-            Text("v 2.1.1")
+            Text("v 2.1.0")
                 .font(.subheadline)
                 .italic()
                 .foregroundColor(.gray)
