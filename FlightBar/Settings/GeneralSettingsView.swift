@@ -6,11 +6,20 @@
 //
 
 import SwiftUI
+import AppKit
 import LaunchAtLogin
 
 struct GeneralSettingsView: View {
-    @State private var showDockIcon: Bool = true
-    @State private var showNotifications: Bool = false
+    @State private var showDockIcon = UserDefaults.standard.bool(forKey: "ShowDockIcon")
+    @State private var showNotifications: Bool = UserDefaults.standard.bool(forKey: "showNotifications")
+    
+    func toggleDockIconVisibility(show: Bool) {
+        if show {
+            NSApp.setActivationPolicy(.regular)
+        } else {
+            NSApp.setActivationPolicy(.accessory)
+        }
+    }
     
     var body: some View {
         Form {
@@ -19,8 +28,15 @@ struct GeneralSettingsView: View {
             }
             Toggle("Show Dock Icon", isOn: $showDockIcon)
                 .toggleStyle(.checkbox)
+                .onChange(of: showDockIcon) { oldValue, newValue in
+                    toggleDockIconVisibility(show: newValue)
+                    UserDefaults.standard.set(newValue, forKey: "ShowDockIcon")
+                }
             Toggle("Show Notification on Flight Status Change", isOn: $showNotifications)
                 .toggleStyle(.checkbox)
+                .onChange(of: showNotifications) { oldValue, newValue in
+                    UserDefaults.standard.set(newValue, forKey: "showNotifications")
+                }
         }
     }
 }

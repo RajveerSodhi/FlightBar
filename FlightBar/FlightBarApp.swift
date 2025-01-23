@@ -1,8 +1,3 @@
-// Allow to nickname flights and show nickname instead of flight number. e.g. - Juhi's Flight
-
-
-
-
 import SwiftUI
 
 @main
