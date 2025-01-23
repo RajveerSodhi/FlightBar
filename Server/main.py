@@ -161,77 +161,50 @@ def get_flight_data(iata, key: str = Depends(validate_secret_key)):
 @app.get("/test")
 def get_test():
     return {
-    "flight_no": "AC39",
+    "flight_no": "AS801",
     "airline": {
-        "iata": "AC",
-        "name": "Air Canada"
+        "iata": "AS",
+        "name": "Alaska Airlines"
     },
     "departure": {
-        "iata": "YVR",
-        "scheduled_time": "2025-01-15T23:45:00.000",
-        "estimated_time": "2025-01-16T00:30:00.000",
-        "actual_time": "2025-01-16T00:19:00.000",
-        "delay": 35,
-        "name": "Vancouver International"
+        "iata": "SEA",
+        "scheduled_time": "2025-01-22T19:12:00.000",
+        "estimated_time": "2025-01-22T19:12:00.000",
+        "actual_time": "2025-01-22T19:23:00.000",
+        "delay": "12",
+        "persistent": {
+            "name": "Seattle Tacoma International Airport",
+            "country": "US",
+            "timezone": "America/Los_Angeles",
+            "latitude": 47.4490013123,
+            "longitude": -122.3089981079
+        }
     },
     "arrival": {
-        "iata": "AKL",
-        "scheduled_time": "2025-01-17T11:00:00.000",
-        "estimated_time": "2025-01-17T10:43:00.000",
-        "actual_time": "2025-01-17T10:51:00.000",
-        "delay": 5,
-        "name": "Auckland International"
+        "iata": "KOA",
+        "scheduled_time": "2025-01-22T23:44:00.000",
+        "estimated_time": "2025-01-22T23:04:00.000",
+        "actual_time": null,
+        "delay": null,
+        "persistent": {
+            "name": "Kona International At Keahole Airport",
+            "country": "US",
+            "timezone": "Pacific/Honolulu",
+            "latitude": 19.7388000488,
+            "longitude": -156.046005249
+        }
     },
-    "status": "landed",
+    "status": "active",
     "speed": {
         "vertical": 0.0,
-        "horizontal": 0.0
+        "horizontal": 801.916
     },
     "geography": {
-        "altitude": 0.0,
-        "direction": 0.0,
-        "latitude": 0.0,
-        "longitude": 0.0
+        "altitude": 10363.2,
+        "direction": 230.0,
+        "latitude": 43.834,
+        "longitude": -129.717
     },
-    "timestamp": "2025-01-22 02:59:13.421799+00:00",
-    "flight_mins": 0
+    "timestamp": "2025-01-23 04:34:40.720891+00:00",
+    "flight_mins": 392
 }
-
-# Resposne Format:
-
-# {
-#   "flight_no": "AC39",
-#   "airline": {
-#     "iata": "AC",
-#     "name": "Air Canada"
-#   },
-#   "departure": {
-#     "iata": "YVR",
-#     "scheduled_time": "2025-01-15T23:45:00.000",
-#     "estimated_time": "2025-01-16T00:30:00.000",
-#     "actual_time": "2025-01-16T00:19:00.000",
-#     "delay": 35,
-#     "name": "Vancouver International"
-#   },
-#   "arrival": {
-#     "iata": "AKL",
-#     "scheduled_time": "2025-01-17T11:00:00.000",
-#     "estimated_time": "2025-01-17T10:43:00.000",
-#     "actual_time": "2025-01-17T10:46:00.000",
-#     "delay": null,
-#     "name": "Auckland International"
-#   },
-#   "status": "landed",
-#   "speed": {
-#     "vertical": null,
-#     "horizontal": null
-#   },
-#   "geography": {
-#     "altitude": null,
-#     "direction": null,
-#     "latitude": null,
-#     "longitude": null
-#   },
-#   "timestamp": "2025-01-22 02:59:13.421799+00:00",
-#   "flight_mins": 0
-# }

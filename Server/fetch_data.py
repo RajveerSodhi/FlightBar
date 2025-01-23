@@ -34,14 +34,14 @@ def fetch_flight_schedule(flight_iata, type):
                         "scheduled_time": flight.get("departure", {}).get("scheduledTime"),
                         "estimated_time": flight.get("departure", {}).get("estimatedTime"),
                         "actual_time": flight.get("departure", {}).get("actualTime"),
-                        "delay": flight.get("departure", {}).get("delay"),
+                        "delay": int(flight.get("departure", {}).get("delay")),
                     },
                     "arrival": {
                         "iata": flight.get("arrival", {}).get("iataCode"),
                         "scheduled_time": flight.get("arrival", {}).get("scheduledTime"),
                         "estimated_time": flight.get("arrival", {}).get("estimatedTime"),
                         "actual_time": flight.get("arrival", {}).get("actualTime"),
-                        "delay": flight.get("arrival", {}).get("delay"),
+                        "delay": int(flight.get("arrival", {}).get("delay")),
                     },
                     "status": flight.get("status"),
                 }
