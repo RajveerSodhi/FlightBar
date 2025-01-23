@@ -103,7 +103,7 @@ class FlightViewModel: ObservableObject {
         return regex?.firstMatch(in: flightNumber, options: [], range: range) != nil
     }
     
-    func showStatusNotification(_ flightStatus: String) {
+    func showStatusNotification(_ flightStatus: String, _ flightNumber: String) {
         if SettingsManager.shared.showNotifications {
             if self.flightStatus == nil {
                 self.flightStatus = flightStatus
@@ -120,11 +120,10 @@ class FlightViewModel: ObservableObject {
                 }
                 
                 let content = UNMutableNotificationContent()
-                content.title="Flight Status Change"
-                content.subtitle="There is an update"
+                content.title="Flight \(flightNumber) has a status change: \(flightStatus.capitalized)"
                 content.sound = UNNotificationSound.default
                 
-                let trigger = UNTimeIntervalNotificationTrigger(timeInterval: 1, repeats: false)
+                let trigger = UNTimeIntervalNotificationTrigger(timeInterval: 0.1, repeats: false)
                 
                 let request = UNNotificationRequest(identifier: UUID().uuidString, content: content, trigger: trigger)
                 
@@ -187,7 +186,7 @@ class FlightViewModel: ObservableObject {
                     self.flight = flight
                     self.errorMessage = nil
                     
-                    self.showStatusNotification(flight.status)
+                    self.showStatusNotification(flight.status, flightNumber)
 
                     // Check if flight status is "Landed"
                     if flight.status.lowercased() == "landed" {
@@ -208,7 +207,7 @@ class FlightViewModel: ObservableObject {
         let timer_mins: Double = 24
         let timer_secs: Double = timer_mins * 60
 
-        timer = Timer.scheduledTimer(withTimeInterval: timer_secs, repeats: true) { [weak self] _ in
+        timer = Timer.scheduledTimer(withTimeInterval: 5, repeats: true) { [weak self] _ in
             self?.fetchFlightDetails(for: flightNumber, isAutoRefresh: true, completion: completion)
             print("function called again!")
         }
