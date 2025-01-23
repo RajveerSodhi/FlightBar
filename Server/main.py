@@ -134,6 +134,15 @@ def get_flight_data(iata, key: str = Depends(validate_secret_key)):
 
         # get flying time
         flight_mins = calculate_flying_mins(flight_data["departure"]["scheduled_time"], flight_data["arrival"]["scheduled_time"], flight_data["departure"]["persistent"]["timezone"], flight_data["arrival"]["persistent"]["timezone"])
+
+        # account for delay
+        departure_delay = flight_data["departure"]["delay"]
+        arrival_delay = flight_data["arrival"]["delay"]
+
+        if departure_delay and arrival_delay:
+            delta = arrival_delay - departure_delay
+            flight_mins += delta
+
         flight_hours = int(flight_mins / 60)
 
         # get refresh interval
@@ -162,7 +171,7 @@ def get_test():
         "scheduled_time": "2025-01-15T23:45:00.000",
         "estimated_time": "2025-01-16T00:30:00.000",
         "actual_time": "2025-01-16T00:19:00.000",
-        "delay": "35",
+        "delay": 35,
         "name": "Vancouver International"
     },
     "arrival": {
@@ -201,7 +210,7 @@ def get_test():
 #     "scheduled_time": "2025-01-15T23:45:00.000",
 #     "estimated_time": "2025-01-16T00:30:00.000",
 #     "actual_time": "2025-01-16T00:19:00.000",
-#     "delay": "35",
+#     "delay": 35,
 #     "name": "Vancouver International"
 #   },
 #   "arrival": {
