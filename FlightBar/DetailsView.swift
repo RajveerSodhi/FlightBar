@@ -5,9 +5,28 @@ import Foundation
 struct DetailsView: View {
     @State private var flightNumber: String = ""
     @State private var isLoaded: Bool = true
-    @State private var showSettings: Bool = false
+    @State private var recentlyTrackedFlights: [String] = UserDefaults.standard.array(forKey: "RecentlyTrackedFlights") as? [String] ?? []
     @EnvironmentObject var flightViewModel: FlightViewModel
     
+    private func addFlightToRecentHistory(_ flight: String) {
+        print("adding to history")
+        var updatedHistory = recentlyTrackedFlights
+        print(updatedHistory)
+        updatedHistory.removeAll { $0 == flight }
+        updatedHistory.insert(flight, at: 0)
+        if updatedHistory.count > 5 {
+            updatedHistory.removeLast()
+        }
+        recentlyTrackedFlights = updatedHistory
+        print(updatedHistory)
+        UserDefaults.standard.set(updatedHistory, forKey: "RecentlyTrackedFlights")
+    }
+    
+    private func removeFlightFromRecentHistory(_ flight: String) {
+        recentlyTrackedFlights.removeAll { $0 == flight }
+        UserDefaults.standard.set(recentlyTrackedFlights, forKey: "RecentlyTrackedFlights")
+    }
+
     func fixAirportName(name: String) -> String {
         let words = name.split(separator: " ")
         let newNameArray: [String] = words.map { word in
@@ -246,12 +265,14 @@ struct DetailsView: View {
                 TextField("Flight Number", text: $flightNumber)
                     .textFieldStyle(RoundedBorderTextFieldStyle())
                     .autocorrectionDisabled(true)
+                    .disabled(!isLoaded)
                     .padding(.trailing, 5)
                     .onSubmit {
                         flightNumber = flightNumber.uppercased()
                         isLoaded = false
                         flightViewModel.startAutoRefresh(flightNumber: flightNumber) {
                             isLoaded = true
+                            addFlightToRecentHistory(flightNumber)
                         }
                     }
                 Button(action: {
@@ -259,6 +280,7 @@ struct DetailsView: View {
                     isLoaded = false
                     flightViewModel.startAutoRefresh(flightNumber: flightNumber) {
                         isLoaded = true
+                        addFlightToRecentHistory(flightNumber)
                     }
                 }) {
                     if flightNumber != "" && isLoaded != true {
@@ -278,6 +300,50 @@ struct DetailsView: View {
                 
             }
             .padding()
+            
+            if !recentlyTrackedFlights.isEmpty {
+                VStack(alignment: .leading, spacing: 5) {
+                    ScrollView(.horizontal, showsIndicators: false) {
+                        HStack(spacing: 10) {
+                            ForEach(recentlyTrackedFlights, id: \.self) { flight in
+                                HStack {
+                                    Image(systemName: "clock.arrow.trianglehead.counterclockwise.rotate.90")
+                                        .foregroundColor(.gray)
+                                        .scaleEffect(0.75)
+                                    Button(action: {
+                                        flightNumber = flight
+                                        isLoaded = false
+                                        flightViewModel.startAutoRefresh(flightNumber: flight) {
+                                            isLoaded = true
+                                        }
+                                    }) {
+                                        Text(flight)
+                                    }
+                                    .buttonStyle(PlainButtonStyle())
+                                    Button(action: {
+                                        removeFlightFromRecentHistory(flight)
+                                    }) {
+                                        Image(systemName: "xmark")
+                                            .foregroundColor(.gray)
+                                            .scaleEffect(0.75)
+                                    }
+                                    .buttonStyle(PlainButtonStyle())
+                                }
+                                .padding(.vertical, 4)
+                                .padding(.horizontal, 8)
+                                .background(
+                                    Rectangle()
+                                        .foregroundColor(Color.white.opacity(0.1))
+                                        .cornerRadius(5)
+                                )
+                            }
+                        }
+                    }
+                    .padding(.top, 5)
+                }
+                .padding(.horizontal)
+            }
+            
         }
         .padding()
         .frame(width: 350)
