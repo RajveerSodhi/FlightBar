@@ -1,5 +1,6 @@
 import Foundation
 import UserNotifications
+import Network
 
 // MARK: - FlightInfo
 struct FlightInfo: Codable {
@@ -79,7 +80,14 @@ class FlightViewModel: ObservableObject {
     private var timer: Timer?
     private let urlString = "https://flightbar-55ccda97cd11.herokuapp.com/flight"
     private let testUrlString = "https://flightbar-55ccda97cd11.herokuapp.com/test"
-
+    
+    private let monitor = NWPathMonitor()
+    private let queue = DispatchQueue(label: "NetworkMonitor")
+    
+    init() {
+        monitor.start(queue: queue)
+    }
+    
     var storedFlightNumber: String {
         UserDefaults.standard.string(forKey: flightNumberKey) ?? ""
     }
@@ -137,8 +145,15 @@ class FlightViewModel: ObservableObject {
             return
         }
         
+        guard monitor.currentPath.status == .satisfied else {
+            self.errorMessage = "No internet connection. Please check your network and try again."
+            completion()
+            return
+        }
+        
         let previousFlightNumber = UserDefaults.standard.string(forKey: flightNumberKey)
         if flightNumber == previousFlightNumber {
+            print("same flight number called again")
             completion()
             return
         }

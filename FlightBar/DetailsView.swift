@@ -63,6 +63,7 @@ struct DetailsView: View {
             if let errorMessage = flightViewModel.errorMessage {
                 Text(errorMessage)
                     .foregroundColor(.red)
+                    .multilineTextAlignment(.center)
                     .padding(5)
                 } else if let flight = flightViewModel.flight {
                     
@@ -200,7 +201,6 @@ struct DetailsView: View {
                                             .foregroundColor(.red)
                                     }
                                 }
-                                }
                             }
                         }
                         if flight.geography?.altitude != nil  {
@@ -221,8 +221,12 @@ struct DetailsView: View {
                                 Text("Vertical Speed: \(vspeed) km/h")
                             }
                             .font(.body)
+                        } else if flight.status.lowercased() != "active" {
+                            Text("Tracking data only available while flight is active")
+                                .foregroundColor(.gray)
+                                .padding(5)
                         } else {
-                            Text("Tracking data only available while in flight")
+                            Text("Could not get tracking data")
                                 .foregroundColor(.gray)
                                 .padding(5)
                         }

@@ -171,7 +171,7 @@ def get_test():
         "scheduled_time": "2025-01-22T19:12:00.000",
         "estimated_time": "2025-01-22T19:12:00.000",
         "actual_time": "2025-01-22T19:23:00.000",
-        "delay": "12",
+        "delay": 12,
         "persistent": {
             "name": "Seattle Tacoma International Airport",
             "country": "US",
@@ -184,8 +184,8 @@ def get_test():
         "iata": "KOA",
         "scheduled_time": "2025-01-22T23:44:00.000",
         "estimated_time": "2025-01-22T23:04:00.000",
-        "actual_time": null,
-        "delay": null,
+        "actual_time": None,
+        "delay": None,
         "persistent": {
             "name": "Kona International At Keahole Airport",
             "country": "US",
