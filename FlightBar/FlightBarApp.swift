@@ -8,6 +8,9 @@ struct FlightBarApp: App {
         MenuBarExtra {
             DetailsView()
                 .environmentObject(flightViewModel)
+                .onAppear {
+                    flightViewModel.resetStoredFlightNumber()
+                }
         } label: {
             MenuBarView()
                 .environmentObject(flightViewModel)

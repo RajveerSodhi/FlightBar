@@ -84,6 +84,10 @@ class FlightViewModel: ObservableObject {
         UserDefaults.standard.string(forKey: flightNumberKey) ?? ""
     }
     
+    func resetStoredFlightNumber() {
+        UserDefaults.standard.removeObject(forKey: flightNumberKey)
+    }
+    
     func isValidFlightNumber(_ flightNumber: String) -> Bool {
         let pattern = "^[A-Z]{1,2}\\d{1,4}$"
         let regex = try? NSRegularExpression(pattern: pattern, options: .caseInsensitive)
