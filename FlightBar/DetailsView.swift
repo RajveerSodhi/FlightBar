@@ -5,8 +5,9 @@ import Foundation
 struct DetailsView: View {
     @State private var flightNumber: String = ""
     @State private var isLoaded: Bool = true
+    @State private var showSettings: Bool = false
     @EnvironmentObject var flightViewModel: FlightViewModel
-
+    
     func fixAirportName(name: String) -> String {
         let words = name.split(separator: " ")
         let newNameArray: [String] = words.map { word in
@@ -54,6 +55,8 @@ struct DetailsView: View {
             return "Last updated: \(timeDifference) minutes ago"
         }
     }
+    
+// Layout
     
     var body: some View {
         VStack(alignment: .center, spacing: 10) {
@@ -251,8 +254,16 @@ struct DetailsView: View {
                             .frame(width: 18, height: 18)
                     }
                 }
-            }.padding()
-        }.padding()
-            .frame(width: 350)
+                
+                SettingsLink {
+                    Image(systemName: "gear")
+                    .frame(width: 18, height: 18)
+                }
+                
+            }
+            .padding()
+        }
+        .padding()
+        .frame(width: 350)
     }
 }

@@ -14,13 +14,17 @@ struct SettingsView: View {
                 .tabItem {
                     Label("General", systemImage: "gearshape.fill")
                 }
+            AppearanceSettingsView()
+                .tabItem {
+                    Label("Appearance", systemImage: "pencil")
+                }
             AboutSettingsView()
                 .tabItem {
                     Label("About", systemImage: "info.square.fill")
                 }
         }
-        .padding()
         .frame(width: 350)
+        .padding()
     }
 }
 

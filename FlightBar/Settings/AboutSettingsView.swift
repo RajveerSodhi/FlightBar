@@ -9,11 +9,11 @@ import SwiftUI
 
 struct AboutSettingsView: View {
     var body: some View {
-        VStack(spacing: 20) {
+        VStack(spacing: 10) {
             HStack {
                 Image("icon")
                     .resizable()
-                    .frame(width: 40, height: 40)
+                    .frame(width: 44, height: 44)
                 Text("FlightBar")
                     .font(.largeTitle)
                     .fontWeight(.bold)
@@ -24,7 +24,7 @@ struct AboutSettingsView: View {
                 .foregroundColor(.gray)
             
             Divider()
-                .padding(.vertical, 10)
+                .padding(.vertical, 6)
             
             Link(destination: URL(string: "https://buymeacoffee.com/rajveersodhi")!) {
                 HStack {
@@ -33,10 +33,6 @@ struct AboutSettingsView: View {
                     Text("Support Me")
                         .foregroundColor(.orange)
                 }
-                .frame(maxWidth: .infinity)
-                .padding()
-                .background(Color.orange.opacity(0.2))
-                .cornerRadius(45)
             }
             
             Link(destination: URL(string: "https://www.rajveersodhi.com")!) {
@@ -46,11 +42,8 @@ struct AboutSettingsView: View {
                     Text("Visit My Website")
                         .foregroundColor(.blue)
                 }
-                .frame(maxWidth: .infinity)
-                .padding()
-                .background(Color.blue.opacity(0.2))
-                .cornerRadius(45)
             }
+            .padding(.vertical, 10)
             
             Link(destination: URL(string: "mailto:rajveersodhi03@gmail.com")!) {
                 HStack {
@@ -59,13 +52,7 @@ struct AboutSettingsView: View {
                     Text("Contact Me")
                         .foregroundColor(.green)
                 }
-                .frame(maxWidth: .infinity)
-                .padding()
-                .background(Color.green.opacity(0.2))
-                .cornerRadius(45)
             }
-            
-            Spacer()
         }
     }
 }

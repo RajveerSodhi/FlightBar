@@ -15,6 +15,7 @@
 		5543793E2C23609B000AA9D9 /* Color.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5543793D2C23609B000AA9D9 /* Color.swift */; };
 		5585F20B2C222FC500F20A4B /* MenuBarView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5585F20A2C222FC500F20A4B /* MenuBarView.swift */; };
 		5585F20D2C22300000F20A4B /* DetailsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5585F20C2C22300000F20A4B /* DetailsView.swift */; };
+		55AB4F1F2D41D6DA00F29889 /* LaunchAtLogin in Frameworks */ = {isa = PBXBuildFile; productRef = 55AB4F1E2D41D6DA00F29889 /* LaunchAtLogin */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -40,6 +41,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				55AB4F1F2D41D6DA00F29889 /* LaunchAtLogin in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -135,6 +137,9 @@
 				Base,
 			);
 			mainGroup = 550FB5FF2C20C9D300CAF47F;
+			packageReferences = (
+				55AB4F1D2D41D6DA00F29889 /* XCRemoteSwiftPackageReference "LaunchAtLogin-Modern" */,
+			);
 			productRefGroup = 550FB6092C20C9D300CAF47F /* Products */;
 			projectDirPath = "";
 			projectRoot = "";
@@ -371,6 +376,25 @@
 			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
+
+/* Begin XCRemoteSwiftPackageReference section */
+		55AB4F1D2D41D6DA00F29889 /* XCRemoteSwiftPackageReference "LaunchAtLogin-Modern" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/sindresorhus/LaunchAtLogin-Modern";
+			requirement = {
+				branch = main;
+				kind = branch;
+			};
+		};
+/* End XCRemoteSwiftPackageReference section */
+
+/* Begin XCSwiftPackageProductDependency section */
+		55AB4F1E2D41D6DA00F29889 /* LaunchAtLogin */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 55AB4F1D2D41D6DA00F29889 /* XCRemoteSwiftPackageReference "LaunchAtLogin-Modern" */;
+			productName = LaunchAtLogin;
+		};
+/* End XCSwiftPackageProductDependency section */
 	};
 	rootObject = 550FB6002C20C9D300CAF47F /* Project object */;
 }
