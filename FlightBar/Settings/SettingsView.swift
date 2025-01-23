@@ -12,7 +12,7 @@ struct SettingsView: View {
         TabView {
             GeneralSettingsView()
                 .tabItem {
-                    Label("  General  ", systemImage: "gearshape.fill")
+                    Label("General", systemImage: "gearshape.fill")
                 }
             AppearanceSettingsView()
                 .tabItem {
@@ -20,7 +20,7 @@ struct SettingsView: View {
                 }
             AboutSettingsView()
                 .tabItem {
-                    Label("  About  ", systemImage: "info.square.fill")
+                    Label("About", systemImage: "info.square.fill")
                 }
         }
         .frame(width: 350)

@@ -8,20 +8,17 @@
 import SwiftUI
 
 struct AppearanceSettingsView: View {
-    @State private var showInMenuBar: Bool = false
-    @State private var showStatusIcons: Bool = true
-    @State private var showAirline: Bool = false
-    @State private var showRoute: Bool = false
+    @ObservedObject var settings = SettingsManager.shared
     
     var body: some View {
         Form {
-            Toggle("Show Flight Status in Menu Bar", isOn: $showInMenuBar)
+            Toggle("Show Flight Status in Menu Bar", isOn: $settings.showInMenuBar)
                 .toggleStyle(.checkbox)
-            Toggle("Use Dynamic Icons based on Status", isOn: $showStatusIcons)
+            Toggle("Use Dynamic Icons based on Status", isOn: $settings.showStatusIcons)
                 .toggleStyle(.checkbox)
-            Toggle("Show Airline Name in Menu Bar", isOn: $showAirline)
+            Toggle("Show Airline Name in Menu Bar", isOn: $settings.showAirline)
                 .toggleStyle(.checkbox)
-            Toggle("Show Route in Menu Bar", isOn: $showRoute)
+            Toggle("Show Route in Menu Bar", isOn: $settings.showRoute)
                 .toggleStyle(.checkbox)
         }
     }
