@@ -71,7 +71,8 @@ def get_flight_data(iata, key: str = Depends(validate_secret_key)):
         print(f"Fetching schedule for {iata} as departure")
         if not flight_data:
             print(f"No data found for departure. Trying arrival for {iata}")
-            flight_data = fetch_flight_schedule(iata, "arrival")
+            # flight_data = fetch_flight_schedule(iata, "arrival")
+            flight_data = retry_on_failure(fetch_flight_schedule, 3, 2, *(iata, "arrival"))
         if not flight_data:
             raise HTTPException(status_code=404, detail="Flight Schedule details not found")
         print("schedule found!")
