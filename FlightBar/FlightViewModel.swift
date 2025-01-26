@@ -207,7 +207,7 @@ class FlightViewModel: ObservableObject {
         let timer_mins: Double = 24
         let timer_secs: Double = timer_mins * 60
 
-        timer = Timer.scheduledTimer(withTimeInterval: 5, repeats: true) { [weak self] _ in
+        timer = Timer.scheduledTimer(withTimeInterval: timer_secs, repeats: true) { [weak self] _ in
             self?.fetchFlightDetails(for: flightNumber, isAutoRefresh: true, completion: completion)
             print("function called again!")
         }

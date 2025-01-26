@@ -106,6 +106,12 @@ struct DetailsView: View {
         }
     }
     
+    private func countryFlag(countryCode: String) -> String {
+        return String(String.UnicodeScalarView(
+           countryCode.unicodeScalars.compactMap(
+             { UnicodeScalar(127397 + $0.value) })))
+      }
+    
 // Layout
     
     var body: some View {
@@ -158,6 +164,7 @@ struct DetailsView: View {
                     let departureLat = flight.departure.persistent.latitude
                     let departureLong = flight.departure.persistent.longitude
                     let departureDelay = flight.departure.delay ?? 0
+                    let departureCountry = flight.departure.persistent.country
                     
                     // Arrival Airport info
                     let arrivalName = fixAirportName(name: flight.arrival.persistent.name)
@@ -168,11 +175,14 @@ struct DetailsView: View {
                     let arrivalLat = flight.arrival.persistent.latitude
                     let arrivalLong = flight.arrival.persistent.longitude
                     let arrivalDelay = flight.arrival.delay ?? 0
+                    let arrivalCountry = flight.arrival.persistent.country
                     
                     // Flight Map info
                     let flightLat = flight.geography?.latitude ?? 49.884491
                     let flightLong = flight.geography?.longitude ?? -119.493500
                     let flightAngle = ((flight.geography?.direction ?? 0.0) - 90)
+                    
+                    let international: Bool = flight.arrival.persistent.country != flight.departure.persistent.country
 
                     VStack {
                         Text("\(airline) - \(flightNo)").font(.title2)
@@ -225,6 +235,9 @@ struct DetailsView: View {
                         
                         HStack {
                             VStack {
+                                if international {
+                                    Text(countryFlag(countryCode: departureCountry))
+                                }
                                 Text(departureIata)
                                     .font(.title3)
                                 Text(departureName)
@@ -253,6 +266,9 @@ struct DetailsView: View {
                             }
                             
                             VStack {
+                                if international {
+                                    Text(countryFlag(countryCode: arrivalCountry))
+                                }
                                 Text(arrivalIata)
                                     .font(.title3)
                                 Text(arrivalName)
